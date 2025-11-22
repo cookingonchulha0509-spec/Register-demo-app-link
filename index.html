@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium App Request</title>
+    <style>
+        /* --- 1. GLOBAL & ANIMATED BACKGROUND --- */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Black -> Navy -> Neon Blue Gradient */
+            background: linear-gradient(-45deg, #000000, #020c2b, #0a1a4a, #00d2ff);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- 2. GLASSMORPHISM CARD --- */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            animation: slideUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes slideUp {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(0,210,255,0.4) 0%, transparent 70%);
+            z-index: -1;
+            animation: floatGlow 6s infinite ease-in-out;
+        }
+
+        @keyframes floatGlow {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(200px, 200px); }
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.7);
+        }
+
+        /* --- 3. FORM FIELDS --- */
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        /* Instruction Text Style */
+        .email-instruction {
+            font-size: 0.85rem;
+            color: #e0e0e0;
+            margin-bottom: 8px;
+            text-shadow: 0 0 5px rgba(0, 210, 255, 0.5);
+            animation: fadeIn 1.5s ease-in-out;
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        input:focus {
+            border-color: #00d2ff;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+            transform: scale(1.01);
+        }
+
+        /* --- 4. SUBMIT BUTTON --- */
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(90deg, #008cff, #00d2ff);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Ripple Effect CSS */
+        .submit-btn::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(0, 0); opacity: 1; }
+            20% { transform: scale(25, 25); opacity: 1; }
+            100% { opacity: 0; transform: scale(40, 40); }
+        }
+
+        .submit-btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        /* --- 7. SUCCESS ANIMATION --- */
+        .success-message {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .tick-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(0, 255, 136, 0.2);
+            border: 2px solid #00ff88;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+        }
+
+        .tick-icon {
+            font-size: 40px;
+            color: #00ff88;
+        }
+
+        .success-text {
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        /* Confetti placeholder style */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            animation: fall linear forwards;
+        }
+        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="glass-card" id="mainCard">
+        <h2>Request App Link</h2>
+        
+        <form id="appForm">
+            <!-- 1. Full Name -->
+            <div class="form-group">
+                <input type="text" id="fullName" placeholder="Your Full Name" required>
+            </div>
+
+            <!-- 2. Email with Instruction Above -->
+            <div class="form-group">
+                <span class="email-instruction">Enter the email and whatsapp where you want to receive the app link
+</span>
+                <input type="email" id="email" placeholder="Enter your Email" required>
+            </div>
+
+            <!-- 3. WhatsApp Number -->
+            <div class="form-group">
+                <input type="tel" id="contact" placeholder="Your WhatsApp Number" required pattern="[0-9]{10,}" title="Please enter a valid mobile number">
+            </div>
+
+            <!-- 4. App Name (Replaced Dropdown) -->
+            <div class="form-group">
+                <input type="text" id="appName" placeholder="Link on WhatsApp or Gmail" required>
+            </div>
+
+            <!-- 5. Submit Button -->
+            <button type="submit" class="submit-btn" id="submitBtn">Request App Link</button>
+        </form>
+
+        <!-- Success Animation Container -->
+        <div class="success-message" id="successMsg">
+            <div class="tick-circle">
+                <span class="tick-icon">✔</span>
+            </div>
+            <p class="success-text">Your request has been submitted!</p>
+            <p style="font-size: 0.9rem; color: #ccc; margin-top: 10px;">Redirecting to WhatsApp...</p>
+        </div>
+    </div>
+
+    <!-- --- 5. FIREBASE & LOGIC --- -->
+    <script type="module">
+        // Import Firebase SDK (CDN)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, push, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        // TODO: Replace this with your actual Firebase Project Config
+        const firebaseConfig = {
+  apiKey: "AIzaSyBigXJAo1FmpxH4c2gifUCoBJe2hltaoTE",
+  authDomain: "repli-mate.firebaseapp.com",
+  databaseURL: "https://repli-mate-default-rtdb.firebaseio.com",
+  projectId: "repli-mate",
+  storageBucket: "repli-mate.firebasestorage.app",
+  messagingSenderId: "316690019973",
+  appId: "1:316690019973:web:44c4595e329fb0994bdbec"
+};
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Form Handling
+        const form = document.getElementById('appForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMsg = document.getElementById('successMsg');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Animation Loading
+            const originalBtnText = submitBtn.innerText;
+            submitBtn.innerText = "Sending...";
+            submitBtn.style.opacity = "0.7";
+            submitBtn.disabled = true;
+
+            // Get Data
+            const name = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const contact = document.getElementById('contact').value;
+            const appReq = document.getElementById('appName').value;
+
+            // Reference to 'users' node
+            const userListRef = ref(db, 'users');
+            const newPostRef = push(userListRef);
+
+            // Save to Firebase Realtime Database
+            set(newPostRef, {
+                name: name,
+                email: email,
+                contact: contact,
+                appName: appReq,
+                timestamp: serverTimestamp()
+            })
+            .then(() => {
+                // 6. WhatsApp Auto-Send Logic
+                const waNumber = "9891504624";
+                const text = `*New App Request*\n\nName: ${name}\nEmail: ${email}\nWhatsApp: ${contact}\nApp Required: ${appReq}`;
+                const encodedText = encodeURIComponent(text);
+                const waUrl = `https://wa.me/${waNumber}?text=${encodedText}`;
+
+                // 7. Success Animation
+                form.style.display = 'none';
+                successMsg.style.display = 'flex';
+                createConfetti();
+
+                // Redirect to WhatsApp after short delay
+                setTimeout(() => {
+                    window.open(waUrl, '_blank');
+                }, 1500);
+
+                // Reset (Optional reload or form clear)
+                setTimeout(() => {
+                     // form.reset(); 
+                     // form.style.display = 'block';
+                     // successMsg.style.display = 'none';
+                     // submitBtn.innerText = originalBtnText;
+                     // submitBtn.disabled = false;
+                     // submitBtn.style.opacity = "1";
+                }, 5000); 
+            })
+            .catch((error) => {
+                alert("Error: " + error.message);
+                submitBtn.innerText = originalBtnText;
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = "1";
+            });
+        });
+
+        // Simple Confetti Effect
+        function createConfetti() {
+            const colors = ['#00d2ff', '#00ff88', '#ffffff'];
+            for (let i = 0; i < 50; i++) {
+                const conf = document.createElement('div');
+                conf.classList.add('confetti');
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.animationDuration = Math.random() * 2 + 1 + 's';
+                conf.style.top = '-10px';
+                document.body.appendChild(conf);
+                
+                // Remove after animation
+                setTimeout(() => {
+                    conf.remove();
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>
