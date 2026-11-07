@@ -2,381 +2,2334 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium App Request</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>EarnPro - Earn More. Grow More.</title>
+    <!-- Plus Jakarta Sans & Inter for Exact Mockup Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
     <style>
-        /* --- 1. GLOBAL & ANIMATED BACKGROUND --- */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
+        /* ==========================================================================
+           EXACT MOCKUP THEME & DESIGN TOKENS
+           ========================================================================== */
+        :root {
+            --navy-dark: #070F2B;
+            --navy-mid: #0F2167;
+            --navy-blue: #1B3C98;
+            --royal-blue: #0D47FF;
+            --royal-gradient: linear-gradient(135deg, #1E6BFF 0%, #0037EB 100%);
+            --header-gradient: radial-gradient(circle at 80% 15%, #2563EB 0%, #0D1E5B 55%, #060E2E 100%);
+            --wallet-card-grad: linear-gradient(135deg, #2575FC 0%, #0C3CE9 55%, #092279 100%);
+            --soft-sheet: #F3F6FF;
+            --card-white: #FFFFFF;
+            --input-fill: #F5F7FE;
+            --input-border: #E2E8F8;
+            --gold-grad: linear-gradient(135deg, #FFF3CC 0%, #FFE082 50%, #FFD54F 100%);
+            --gold-text: #7A4900;
+            --text-dark: #0F1D40;
+            --text-muted: #64748B;
+            --success: #10B981;
+            --success-soft: #DCFCE7;
+            --danger: #EF4444;
+            --danger-soft: #FEE2E2;
+            --warning: #F59E0B;
+            --warning-soft: #FEF3C7;
+            --shadow-card: 0 6px 18px rgba(20, 40, 100, 0.05);
+            --shadow-btn: 0 10px 20px -5px rgba(13, 71, 255, 0.4);
+            --nav-height: 74px;
         }
 
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* Black -> Navy -> Neon Blue Gradient */
-            background: linear-gradient(-45deg, #000000, #020c2b, #0a1a4a, #00d2ff);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: white;
-            overflow-x: hidden;
-            padding: 20px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--soft-sheet); display: flex; justify-content: center; align-items: center; min-height: 100vh; min-height: 100dvh; color: var(--text-dark); overflow: hidden; }
+        #app-container { width: 100%; max-width: 480px; height: 100vh; height: 100dvh; background: var(--soft-sheet); position: relative; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.1); }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        @keyframes shimmerAnim { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        @keyframes smoothReveal { 0% { opacity: 0; transform: translateY(10px) scale(0.985); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes softFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- 2. GLASSMORPHISM CARD --- */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 210, 255, 0.3);
+        .smooth-item { opacity: 0; animation: smoothReveal 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards; will-change: transform, opacity; }
+        .sk-shimmer { background: linear-gradient(90deg, #E2E8F8 25%, #F4F7FF 50%, #E2E8F8 75%); background-size: 200% 100%; animation: shimmerAnim 1.35s infinite linear; }
+        .sk-shimmer-dark { background: linear-gradient(90deg, rgba(255,255,255,0.14) 25%, rgba(255,255,255,0.32) 50%, rgba(255,255,255,0.14) 75%); background-size: 200% 100%; animation: shimmerAnim 1.35s infinite linear; }
+        .sk-shimmer-gold { background: linear-gradient(90deg, rgba(180, 83, 9, 0.14) 25%, rgba(180, 83, 9, 0.28) 50%, rgba(180, 83, 9, 0.14) 75%); background-size: 200% 100%; animation: shimmerAnim 1.35s infinite linear; }
+        .val-skeleton { display: inline-block; vertical-align: middle; border-radius: 8px; min-width: 68px; height: 24px; }
+        
+        .img-sk-wrap { position: relative; overflow: hidden; background: linear-gradient(90deg, #E2E8F8 25%, #F4F7FF 50%, #E2E8F8 75%); background-size: 200% 100%; animation: shimmerAnim 1.35s infinite linear; }
+        .img-sk-wrap.loaded-wrap { background: transparent; animation: none; }
+        img.lazy-img { opacity: 0; transform: scale(0.95); transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+        img.lazy-img.is-loaded { opacity: 1; transform: scale(1); }
+
+        .sk-task-card { background: #FFFFFF; border-radius: 20px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow-card); }
+        .sk-icon-box { width: 58px; height: 58px; border-radius: 16px; flex-shrink: 0; }
+        .sk-line { height: 12px; border-radius: 6px; margin-bottom: 8px; }
+        .sk-line.w-70 { width: 70%; height: 15px; }
+        .sk-line.w-90 { width: 90%; height: 11px; }
+        .sk-line.w-45 { width: 45%; height: 13px; margin-bottom: 0; }
+        .sk-cat-tile { background: #FFFFFF; border-radius: 18px; padding: 12px 6px 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: var(--shadow-card); }
+        .sk-history-item { background: #FFFFFF; padding: 14px 16px; border-radius: 18px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow-card); }
+
+        .inline-loader-pill { display: none; align-items: center; justify-content: center; gap: 9px; padding: 14px 18px; margin: 6px auto 12px; font-size: 12.5px; font-weight: 700; color: var(--royal-blue); background: #FFFFFF; border-radius: 100px; box-shadow: var(--shadow-card); width: fit-content; animation: softFadeIn 0.25s ease; }
+        .inline-loader-pill.show { display: flex; }
+        .mini-spinner { width: 16px; height: 16px; border: 2.5px solid rgba(13, 71, 255, 0.2); border-top-color: var(--royal-blue); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+        .mini-spinner.white { border-color: rgba(255, 255, 255, 0.3); border-top-color: #FFFFFF; }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Splash */
+        #loading-overlay { position: absolute; inset: 0; background: url('splash-background.png') center/cover no-repeat, radial-gradient(circle at 50% 35%, #1E40AF 0%, #091540 55%, #04091E 100%); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #FFFFFF; transition: opacity 0.28s ease; }
+        .splash-logo-wrap { width: 130px; height: 130px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+        .splash-logo { width: 118px; height: 118px; object-fit: contain; z-index: 2; filter: drop-shadow(0 14px 25px rgba(0, 0, 0, 0.45)); }
+        .splash-title { font-size: 36px; font-weight: 800; letter-spacing: -0.8px; margin-bottom: 6px; }
+        .splash-subtitle { font-size: 15px; font-weight: 500; color: rgba(255, 255, 255, 0.85); margin-bottom: 110px; }
+        .splash-loader-box { position: absolute; bottom: 48px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .spinner { width: 34px; height: 34px; border: 3.5px solid rgba(255, 255, 255, 0.18); border-top-color: #60A5FA; border-right-color: #FFFFFF; border-radius: 50%; animation: spin 0.85s linear infinite; }
+        .splash-loading-text { font-size: 13px; color: rgba(255, 255, 255, 0.8); font-weight: 500; }
+
+        /* Screens Base */
+        .screen { display: none; flex-direction: column; height: 100%; overflow-y: auto; overflow-x: hidden; background: var(--soft-sheet); padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 18px); scrollbar-width: none; }
+        .screen::-webkit-scrollbar { display: none; }
+        .screen.active { display: flex; animation: fadeIn 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
+        .screen.no-nav { padding-bottom: 28px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* General UI Elements */
+        .auth-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid #FFFFFF; border-radius: 24px; padding: 20px 18px; box-shadow: 0 12px 32px rgba(15, 29, 64, 0.06); }
+        .input-group { margin-bottom: 14px; }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper i.left-icon { position: absolute; left: 16px; color: #4F6596; font-size: 16px; pointer-events: none; }
+        .input-wrapper i.right-icon { position: absolute; right: 16px; color: #7E92BC; font-size: 15px; cursor: pointer; }
+        .input-wrapper input { width: 100%; padding: 15px 42px 15px 44px; background: var(--input-fill); border: 1.5px solid var(--input-border); border-radius: 14px; font-size: 14px; font-weight: 600; color: var(--text-dark); transition: 0.2s; }
+        .input-wrapper input::placeholder { color: #7E92BC; font-weight: 500; }
+        .input-wrapper input:focus { outline: none; background: #FFFFFF; border-color: var(--royal-blue); box-shadow: 0 0 0 3px rgba(13, 71, 255, 0.1); }
+        .btn-royal { width: 100%; background: var(--royal-gradient); color: #FFFFFF; border: none; padding: 15px; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: var(--shadow-btn); transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-royal:active:not(:disabled) { transform: scale(0.98); }
+        .btn-royal:disabled { background: #CBD5E1; box-shadow: none; cursor: not-allowed; }
+
+        #auth-screen { background: radial-gradient(circle at 50% 0%, #E0EAFF 0%, #F5F8FF 45%, #EEF3FF 100%); }
+        .auth-wrapper { padding: 24px 22px 36px; display: flex; flex-direction: column; min-height: 100%; }
+        .auth-brand-top { text-align: center; padding: 16px 0 18px; }
+        .auth-brand-top img { width: 78px; height: 78px; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(13, 71, 255, 0.2)); margin-bottom: 6px; }
+        .auth-brand-name { font-size: 28px; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+        .auth-portal-sub { font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
+        .auth-welcome-box { text-align: center; margin: 10px 0 18px; }
+        .auth-welcome-box h2 { font-size: 22px; font-weight: 800; color: var(--text-dark); }
+        .auth-welcome-box p { font-size: 13.5px; color: var(--text-muted); margin-top: 4px; }
+        
+        .reg-top-hero { display: none; position: relative; padding: 8px 0 18px; }
+        .reg-back-btn { width: 38px; height: 38px; border-radius: 50%; background: rgba(255, 255, 255, 0.8); display: flex; align-items: center; justify-content: center; color: var(--text-dark); font-size: 16px; cursor: pointer; box-shadow: var(--shadow-card); margin-bottom: 18px; }
+        .reg-hero-row { display: flex; justify-content: space-between; align-items: flex-end; }
+        .reg-hero-text h2 { font-size: 24px; font-weight: 800; color: var(--text-dark); }
+        .reg-hero-text p { font-size: 13.5px; color: var(--text-muted); margin-top: 4px; }
+        .reg-gift-img { width: 96px; height: 96px; object-fit: contain; margin-top: -36px; filter: drop-shadow(0 10px 18px rgba(37, 99, 235, 0.25)); }
+        .auth-tabs { display: flex; background: #E6EEFF; border-radius: 14px; padding: 4px; margin-bottom: 20px; position: relative; }
+        .auth-tab { flex: 1; text-align: center; padding: 11px 0; font-size: 14.5px; font-weight: 700; color: var(--text-muted); border-radius: 11px; cursor: pointer; transition: 0.25s; position: relative; }
+        .auth-tab.active { background: #FFFFFF; color: var(--royal-blue); box-shadow: 0 4px 12px rgba(13, 71, 255, 0.12); }
+        .auth-tab.active::after { content: ''; position: absolute; bottom: 0; left: 22%; width: 56%; height: 3px; background: var(--royal-blue); border-radius: 3px; }
+        .auth-options-row { display: flex; justify-content: space-between; align-items: center; margin: 6px 2px 18px; font-size: 13px; }
+        .remember-label { display: flex; align-items: center; gap: 8px; color: var(--text-dark); font-weight: 600; cursor: pointer; }
+        .remember-label input { width: 17px; height: 17px; accent-color: var(--royal-blue); border-radius: 4px; }
+        .forgot-link { color: var(--royal-blue); font-weight: 700; background: none; border: none; cursor: pointer; font-size: 13px; }
+        .reg-consent-box { display: none; margin: 8px 2px 18px; flex-direction: column; gap: 10px; }
+        .consent-item { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: var(--text-dark); }
+        .consent-item input { width: 18px; height: 18px; accent-color: var(--royal-blue); cursor: pointer; }
+        .consent-item a { color: var(--royal-blue); text-decoration: none; font-weight: 700; }
+        .auth-footer-switch { margin-top: 20px; text-align: center; font-size: 13.5px; font-weight: 600; color: var(--text-dark); }
+        .auth-footer-switch button { background: none; border: none; color: var(--royal-blue); font-weight: 800; font-size: 13.5px; cursor: pointer; margin-left: 4px; }
+
+        /* Home Screen */
+        .home-dark-hero { background: var(--header-gradient); padding: 20px 20px 36px; color: #FFFFFF; position: relative; }
+        .home-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .home-brand-row { display: flex; align-items: center; gap: 10px; }
+        .home-brand-row img { width: 38px; height: 38px; object-fit: contain; }
+        .home-brand-title { font-size: 21px; font-weight: 800; letter-spacing: -0.4px; }
+        .home-wallet-card { background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 55%, #1E3A8A 100%); border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 22px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28); position: relative; overflow: hidden; }
+        .home-wallet-left { display: flex; align-items: center; gap: 14px; z-index: 2; }
+        .wallet-mini-logo { width: 50px; height: 50px; border-radius: 14px; background: rgba(255, 255, 255, 0.15); display: flex; align-items: center; justify-content: center; padding: 6px; }
+        .wallet-mini-logo img { width: 100%; height: 100%; object-fit: contain; }
+        .wallet-meta-label { font-size: 12px; color: rgba(255, 255, 255, 0.85); font-weight: 600; }
+        .wallet-meta-amount { font-size: 26px; font-weight: 800; line-height: 1.15; letter-spacing: -0.5px; min-height: 30px; display: flex; align-items: center; }
+        .wallet-meta-unit { font-size: 12px; color: rgba(255, 255, 255, 0.85); font-weight: 600; }
+        .withdraw-pill-btn { background: #FFFFFF; color: var(--royal-blue); border: none; padding: 9px 15px; border-radius: 100px; font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); z-index: 2; }
+        
+        .home-sheet-body { background: var(--soft-sheet); border-top-left-radius: 28px; border-top-right-radius: 28px; margin-top: -20px; padding: 20px 18px 16px; position: relative; z-index: 3; flex: 1; }
+        .progress-card { background: #FFFFFF; border-radius: 20px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-card); margin-bottom: 20px; position: relative; }
+        .progress-info { flex: 1; padding-right: 12px; }
+        .progress-title { font-size: 15px; font-weight: 800; color: var(--text-dark); }
+        .progress-sub { font-size: 13px; font-weight: 600; color: var(--text-muted); margin: 4px 0 10px; min-height: 18px; display: flex; align-items: center; gap: 5px; }
+        .progress-sub strong { color: var(--text-dark); font-weight: 800; }
+        .progress-bar-track { width: 100%; height: 8px; background: #E2E8F8; border-radius: 100px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; width: 0%; background: var(--royal-gradient); border-radius: 100px; transition: width 0.65s cubic-bezier(0.22, 1, 0.36, 1); }
+        .progress-star-img { width: 62px; height: 62px; object-fit: contain; filter: drop-shadow(0 6px 12px rgba(245, 158, 11, 0.3)); }
+        
+        .sec-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .sec-head h3 { font-size: 16.5px; font-weight: 800; color: var(--text-dark); }
+        .sec-head span { font-size: 13px; font-weight: 700; color: var(--royal-blue); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+        
+        .category-tiles-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; }
+        .cat-tile { background: #FFFFFF; border-radius: 18px; padding: 12px 6px 10px; display: flex; flex-direction: column; align-items: center; gap: 7px; cursor: pointer; box-shadow: var(--shadow-card); border: 2px solid transparent; transition: 0.2s; }
+        .cat-tile.active { border-color: var(--royal-blue); background: #EFF4FF; }
+        .cat-tile-icon { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #FFFFFF; overflow: hidden; }
+        .cat-tile span { font-size: 12px; font-weight: 700; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        
+        /* =========================================================
+           NEW TASK CARD UI (100% Matching Provided Image)
+           ========================================================= */
+        .task-list { display: flex; flex-direction: column; gap: 16px; }
+        .new-task-card {
+            background: #FFFFFF;
             border-radius: 20px;
-            padding: 40px 30px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            animation: slideUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-            position: relative;
-            overflow: hidden;
-        }
-
-        @keyframes slideUp {
-            0% { transform: translateY(50px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(0,210,255,0.4) 0%, transparent 70%);
-            z-index: -1;
-            animation: floatGlow 6s infinite ease-in-out;
-        }
-
-        @keyframes floatGlow {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(200px, 200px); }
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(0, 210, 255, 0.7);
-        }
-
-        /* --- 3. FORM FIELDS --- */
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: #ccc;
-        }
-
-        /* Instruction Text Style */
-        .email-instruction {
-            font-size: 0.85rem;
-            color: #e0e0e0;
-            margin-bottom: 8px;
-            text-shadow: 0 0 5px rgba(0, 210, 255, 0.5);
-            animation: fadeIn 1.5s ease-in-out;
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        input {
-            width: 100%;
-            padding: 14px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        input:focus {
-            border-color: #00d2ff;
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
-            transform: scale(1.01);
-        }
-
-        /* --- 4. SUBMIT BUTTON --- */
-        .submit-btn {
-            width: 100%;
             padding: 16px;
-            background: linear-gradient(90deg, #008cff, #00d2ff);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
             position: relative;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .submit-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Ripple Effect CSS */
-        .submit-btn::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 5px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.5);
-            opacity: 0;
-            border-radius: 100%;
-            transform: scale(1, 1) translate(-50%);
-            transform-origin: 50% 50%;
-        }
-
-        @keyframes ripple {
-            0% { transform: scale(0, 0); opacity: 1; }
-            20% { transform: scale(25, 25); opacity: 1; }
-            100% { opacity: 0; transform: scale(40, 40); }
-        }
-
-        .submit-btn:focus:not(:active)::after {
-            animation: ripple 1s ease-out;
-        }
-
-        /* --- 7. SUCCESS ANIMATION --- */
-        .success-message {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .tick-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: rgba(0, 255, 136, 0.2);
-            border: 2px solid #00ff88;
+            box-shadow: 0 8px 24px rgba(15, 29, 64, 0.06);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+            flex-direction: column;
+            gap: 14px;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            border: 1px solid rgba(226, 232, 248, 0.8);
         }
-
-        .tick-icon {
-            font-size: 40px;
-            color: #00ff88;
-        }
-
-        .success-text {
-            color: #fff;
-            font-size: 1.2rem;
-            font-weight: 500;
-        }
-
-        /* Confetti placeholder style */
-        .confetti {
+        .new-task-card:active { transform: scale(0.98); }
+        
+        /* Top Badge */
+        .ntc-badge {
             position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: #f00;
-            animation: fall linear forwards;
+            top: 0; left: 0;
+            background: linear-gradient(90deg, #0D47FF, #0037EB);
+            color: #FFFFFF;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-bottom-right-radius: 14px;
+            border-top-left-radius: 18px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 2px 2px 10px rgba(13, 71, 255, 0.3);
         }
-        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+        
+        /* Middle Content Row */
+        .ntc-content-row {
+            display: flex;
+            gap: 14px;
+            margin-top: 14px; /* Space for absolute badge */
+            align-items: center;
+        }
+        
+        .ntc-app-icon {
+            width: 66px; height: 66px;
+            border-radius: 16px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #E2E8F8;
+            flex-shrink: 0;
+        }
+        
+        .ntc-info {
+            flex: 1;
+            min-width: 0; /* Prevents flex blowout */
+        }
+        .ntc-title {
+            font-size: 16.5px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.25;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .ntc-desc {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Glassy Reward Box */
+        .ntc-reward-box {
+            background: linear-gradient(135deg, #FFF8E1 0%, #FFE082 100%);
+            border: 1.5px solid #FDE68A;
+            border-radius: 14px;
+            padding: 8px 12px 12px;
+            text-align: center;
+            position: relative;
+            min-width: 85px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.15);
+        }
+        .ntc-reward-pill {
+            background: linear-gradient(90deg, #F59E0B, #D97706);
+            color: #FFFFFF;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 100px;
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4);
+        }
+        .ntc-reward-amt {
+            font-size: 24px;
+            font-weight: 900;
+            color: #451A03;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: -0.5px;
+        }
+        /* Floating Coin (Placeholder for your PNG) */
+        .ntc-floating-coin {
+            position: absolute;
+            right: -12px;
+            bottom: -8px;
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #FCD34D, #F59E0B);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFF;
+            font-size: 18px;
+            border: 2px solid #FFF;
+            box-shadow: 0 4px 10px rgba(217, 119, 6, 0.4);
+        }
+        .ntc-floating-coin img { width:100%; height:100%; object-fit:contain; }
+        
+        /* Bottom Action Row */
+        .ntc-bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1.5px solid #F1F5F9;
+        }
+        .ntc-meta-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .ntc-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ntc-meta-icon {
+            color: var(--royal-blue);
+            font-size: 16px;
+        }
+        .ntc-meta-texts {
+            display: flex;
+            flex-direction: column;
+        }
+        .ntc-meta-t1 { font-size: 12px; font-weight: 800; color: var(--text-dark); }
+        .ntc-meta-t2 { font-size: 10px; font-weight: 600; color: var(--text-muted); }
+        
+        .ntc-meta-divider { width: 1px; height: 24px; background: #E2E8F8; }
+        
+        .ntc-start-btn {
+            background: linear-gradient(90deg, #1E6BFF, #0037EB);
+            color: #FFFFFF;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 100px;
+            font-size: 13.5px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 6px 14px rgba(13, 71, 255, 0.3);
+            cursor: pointer;
+        }
 
+        /* Task Details */
+        #task-detail-screen { background: radial-gradient(circle at 50% 0%, #E0EAFF 0%, #F4F7FF 50%); }
+        .top-light-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 20px 10px; }
+        .circle-icon-btn { width: 38px; height: 38px; border-radius: 50%; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: var(--text-dark); font-size: 15px; cursor: pointer; box-shadow: var(--shadow-card); }
+        .task-hero-center { text-align: center; padding: 4px 24px 18px; }
+        .task-hero-icon-shell { width: 96px; height: 96px; margin: 0 auto 10px; border-radius: 22px; display: flex; align-items: center; justify-content: center; border: 1px solid #E2E8F8; background: #FFFFFF; }
+        .task-hero-center img.hero-3d-icon { width: 96px; height: 96px; object-fit: contain; filter: drop-shadow(0 12px 20px rgba(37, 99, 235, 0.25)); border-radius: 22px; }
+        .task-hero-center h2 { font-size: 24px; font-weight: 800; color: var(--text-dark); margin-bottom: 6px; }
+        .task-cat-pill { display: inline-block; background: #E9D5FF; color: #6D28D9; font-size: 12px; font-weight: 700; padding: 4px 14px; border-radius: 100px; margin-bottom: 10px; }
+        .task-hero-center p { font-size: 13.5px; color: var(--text-muted); font-weight: 500; max-width: 280px; margin: 0 auto 16px; }
+        .gold-reward-banner { background: var(--gold-grad); border: 1px solid #FDE68A; border-radius: 18px; padding: 12px 20px; display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0 20px 18px; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.15); }
+        .gold-coin-circle { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #F59E0B, #D97706); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.35); }
+        .gold-reward-text { text-align: left; flex:1; }
+        .gold-reward-text span { display: block; font-size: 11.5px; font-weight: 700; color: #92400E; }
+        .gold-reward-text strong { font-size: 19px; font-weight: 800; color: #451A03; display: flex; align-items: center; gap: 5px; }
+        .task-rules-box { padding: 0 22px 16px; }
+        .task-rules-box h4 { font-size: 15.5px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
+        .rules-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .rules-list li { font-size: 13.5px; font-weight: 600; color: var(--text-dark); display: flex; align-items: flex-start; gap: 8px; line-height:1.4; }
+        .rules-list li i { color: var(--royal-blue); font-size: 8px; margin-top:5px; flex-shrink:0; }
+        .stages-container { padding: 0 20px 24px; }
+        .stages-container h4 { font-size: 15.5px; font-weight: 800; color: var(--text-dark); margin-bottom: 12px; }
+        .stage-card-row { background: #FFFFFF; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; margin-bottom: 10px; box-shadow: var(--shadow-card); position: relative; }
+        .stage-status-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .stage-status-icon.done { background: var(--success); color: #FFFFFF; }
+        .stage-status-icon.active { background: var(--royal-blue); color: #FFFFFF; }
+        .stage-status-icon.pending { background: var(--warning); color: #FFFFFF; }
+        .stage-status-icon.locked { background: #E2E8F0; color: #64748B; }
+        .stage-mid-info { flex: 1; }
+        .stage-mid-info .st-title { font-size: 14.5px; font-weight: 800; color: var(--text-dark); }
+        .stage-mid-info .st-sub { font-size: 12.5px; font-weight: 500; color: var(--text-muted); }
+        .stage-right-coins { font-size: 13.5px; font-weight: 800; color: var(--success); }
+        .sticky-stage-cta { padding: 0 20px 16px; margin-top: auto; }
+        .task-complete-banner { background: var(--success-soft); border: 2px solid var(--success); padding: 16px; border-radius: 18px; text-align: center; margin-bottom: 16px; display:none; }
+        .task-complete-banner i { font-size: 32px; color: var(--success); margin-bottom: 8px; }
+        .task-complete-banner h3 { font-size: 18px; font-weight: 800; color: var(--success); margin-bottom: 4px; }
+        .task-complete-banner p { font-size: 14px; font-weight: 600; color: #065F46; }
+
+        /* Wallet */
+        .wallet-hero-card { background: var(--wallet-card-grad); margin: 8px 20px 20px; padding: 22px 20px; border-radius: 24px; color: #FFFFFF; position: relative; overflow: hidden; box-shadow: 0 14px 30px rgba(13, 71, 255, 0.28); min-height: 145px; display: flex; flex-direction: column; justify-content: center; }
+        .wallet-hero-card .w-label { font-size: 14px; color: rgba(255, 255, 255, 0.85); font-weight: 600; margin-bottom: 6px; }
+        .wallet-hero-card .w-balance { font-size: 38px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; min-height: 42px; display: flex; align-items: center; }
+        .wallet-hero-card .w-unit { font-size: 15px; font-weight: 600; color: rgba(255, 255, 255, 0.9); margin-top: 4px; }
+        .wallet-coins-3d { position: absolute; right: 14px; bottom: 10px; width: 95px; height: 95px; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3)); }
+        .history-list { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 10px; }
+        .history-item { background: #FFFFFF; padding: 14px 16px; border-radius: 18px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow-card); }
+        .history-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .history-icon.reward { background: var(--success-soft); color: var(--success); }
+        .history-icon.withdraw { background: var(--danger-soft); color: var(--danger); }
+        .history-info { flex: 1; }
+        .history-info .title { font-size: 14.5px; font-weight: 800; color: var(--text-dark); }
+        .history-info .date { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 2px; }
+        .history-amount { font-size: 14px; font-weight: 800; }
+        .history-amount.positive { color: var(--success); }
+        .history-amount.negative { color: var(--danger); }
+
+        /* Withdraw */
+        #withdraw-screen { background: var(--header-gradient); }
+        .dark-top-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 20px 12px; color: #FFFFFF; }
+        .dark-top-header .back-arrow { font-size: 18px; color: #FFFFFF; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; }
+        .dark-top-header .title { font-size: 17px; font-weight: 800; }
+        .withdraw-hero-center { text-align: center; padding: 10px 20px 24px; color: #FFFFFF; }
+        .withdraw-3d-icon { width: 76px; height: 76px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.35)); }
+        .withdraw-hero-center h2 { font-size: 22px; font-weight: 800; }
+        .withdraw-white-sheet { background: var(--soft-sheet); border-top-left-radius: 30px; border-top-right-radius: 30px; padding: 24px 20px 32px; flex: 1; display: flex; flex-direction: column; }
+        .avail-balance-box { background: var(--gold-grad); border-radius: 18px; padding: 14px; text-align: center; margin-bottom: 18px; border: 1px solid #FDE68A; }
+        .avail-balance-box span { font-size: 12.5px; font-weight: 700; color: #78350F; display: block; }
+        .avail-balance-box strong { font-size: 24px; font-weight: 800; color: #451A03; }
+        .wd-method-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+        .wd-tab { background: #FFFFFF; border: 1.5px solid var(--input-border); border-radius: 12px; padding: 10px; text-align: center; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .wd-tab.selected { border-color: var(--royal-blue); background: #EFF4FF; color: var(--royal-blue); }
+
+        /* Leaderboard */
+        #leaderboard-screen { background: var(--header-gradient); }
+        .lb-toggle-pills { display: flex; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 100px; padding: 4px; margin: 4px 28px 22px; }
+        .lb-pill { flex: 1; text-align: center; padding: 9px 0; border-radius: 100px; font-size: 13.5px; font-weight: 700; color: rgba(255, 255, 255, 0.75); cursor: pointer; }
+        .lb-pill.active { background: var(--royal-gradient); color: #FFFFFF; box-shadow: 0 4px 12px rgba(13, 71, 255, 0.4); }
+        .podium-stage { display: flex; justify-content: center; align-items: flex-end; gap: 10px; padding: 10px 20px 0; min-height: 195px; }
+        .podium-col { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .podium-crown { font-size: 24px; color: #FBBF24; margin-bottom: -6px; z-index: 3; filter: drop-shadow(0 4px 8px rgba(251, 191, 36, 0.5)); }
+        .podium-ava-wrap { position: relative; margin-bottom: 8px; }
+        .podium-ava { width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #3B82F6, #1D4ED8); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; border: 3px solid #FFFFFF; box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3); }
+        .podium-col.rank-1 .podium-ava { width: 72px; height: 72px; font-size: 28px; border-color: #FDE047; background: linear-gradient(135deg, #F59E0B, #B45309); }
+        .podium-col.rank-1 .podium-pedestal { background: linear-gradient(180deg, #FDE68A 0%, #F59E0B 100%); color: #451A03; min-height: 112px; }
+        .podium-col.rank-2 .podium-pedestal { background: linear-gradient(180deg, #E2E8F0 0%, #94A3B8 100%); color: #0F172A; min-height: 92px; }
+        .podium-col.rank-3 .podium-pedestal { background: linear-gradient(180deg, #FED7AA 0%, #D97706 100%); color: #431407; min-height: 84px; }
+        .rank-badge-num { width: 24px; height: 24px; border-radius: 50%; background: rgba(255, 255, 255, 0.85); font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+        .podium-name { font-size: 12.5px; font-weight: 800; width: 85px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .podium-score { font-size: 13px; font-weight: 800; margin-top: 2px; }
+        .lb-sheet { background: var(--soft-sheet); border-top-left-radius: 28px; border-top-right-radius: 28px; padding: 18px 18px 24px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        .lb-row { background: #FFFFFF; border-radius: 16px; padding: 13px 16px; display: flex; align-items: center; box-shadow: var(--shadow-card); }
+        .lb-rank { width: 34px; font-size: 15px; font-weight: 800; color: var(--text-muted); }
+        .lb-info { flex: 1; font-size: 14.5px; font-weight: 800; color: var(--text-dark); white-space: nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:10px; }
+        .lb-reward { font-size: 14.5px; font-weight: 800; color: var(--text-dark); }
+        .lb-you-bar { background: var(--gold-grad); border: 1.5px solid #F59E0B; border-radius: 18px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; margin-top: 6px; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2); }
+
+        /* Profile, Settings & Support */
+        .profile-royal-hero { background: linear-gradient(180deg, #1E50E2 0%, #2563EB 65%, #DBEAFE 100%); padding: 28px 20px 36px; text-align: center; color: #FFFFFF; position: relative; }
+        .profile-ava-ring { width: 86px; height: 86px; border-radius: 50%; background: #FFFFFF; color: var(--royal-blue); font-size: 34px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; border: 3.5px solid #FFFFFF; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2); position: relative; }
+        .profile-ava-ring::after { content: '\f521'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; right: -6px; bottom: 2px; font-size: 16px; color: #FBBF24; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); }
+        .profile-name { font-size: 22px; font-weight: 800; min-height: 28px; display: flex; align-items: center; justify-content: center; }
+        .profile-sub-badge { font-size: 13px; color: rgba(255, 255, 255, 0.9); font-weight: 600; margin-top: 3px; min-height: 18px; display: flex; align-items: center; justify-content: center; }
+        .profile-body-sheet { padding: 0 18px 24px; margin-top: -22px; position: relative; z-index: 2; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+        .stat-card { background: #FFFFFF; padding: 14px 8px; border-radius: 18px; text-align: center; box-shadow: var(--shadow-card); }
+        .stat-value { font-size: 20px; font-weight: 800; color: var(--text-dark); min-height: 26px; display: flex; align-items: center; justify-content: center; }
+        .stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
+        .menu-list { background: #FFFFFF; border-radius: 22px; padding: 6px 14px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; }
+        .menu-item { padding: 14px 6px; border-bottom: 1px solid #F1F5F9; display: flex; align-items: center; justify-content: space-between; font-size: 14.5px; font-weight: 700; color: var(--text-dark); cursor: pointer; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item .left { display: flex; align-items: center; gap: 12px; }
+        .menu-item .left i { width: 28px; color: var(--royal-blue); font-size: 16px; text-align: center; }
+        .menu-item i.fa-chevron-right { font-size: 12px; color: #94A3B8; }
+        
+        #settings-screen { background: var(--header-gradient); }
+        .settings-sheet { background: var(--soft-sheet); border-top-left-radius: 30px; border-top-right-radius: 30px; padding: 22px 18px 32px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+        .setting-row-card { background: #FFFFFF; border-radius: 18px; padding: 15px 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-card); cursor: pointer; }
+        .setting-row-left { display: flex; align-items: center; gap: 14px; }
+        .setting-row-left i { font-size: 20px; color: var(--royal-blue); width: 28px; text-align: center; }
+        .setting-row-left .st-name { font-size: 14.5px; font-weight: 800; color: var(--text-dark); }
+        .setting-row-left .st-sub { font-size: 12px; font-weight: 600; color: var(--royal-blue); margin-top: 2px; }
+        .btn-logout-soft { margin-top: auto; background: linear-gradient(135deg, #FECACA 0%, #FCA5A5 100%); color: #B91C1C; border: none; padding: 15px; border-radius: 16px; font-size: 16px; font-weight: 800; cursor: pointer; text-align: center; }
+        
+        #support-screen { background: radial-gradient(circle at 50% 0%, #E0EAFF 0%, #F4F7FF 55%); }
+        .whatsapp-big-btn { background: var(--whatsapp-grad); color: #FFFFFF; border-radius: 18px; padding: 14px 20px; margin: 0 22px 22px; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; box-shadow: 0 10px 22px rgba(22, 163, 74, 0.3); }
+
+        /* Navbar & Modals */
+        #navbar { position: absolute; bottom: 0; left: 0; right: 0; height: calc(var(--nav-height) + env(safe-area-inset-bottom)); background: #FFFFFF; border-top-left-radius: 24px; border-top-right-radius: 24px; box-shadow: 0 -6px 24px rgba(15, 29, 64, 0.08); display: flex; padding-bottom: env(safe-area-inset-bottom); z-index: 50; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #64748B; cursor: pointer; transition: 0.2s; }
+        .nav-item i { font-size: 20px; }
+        .nav-item span { font-size: 11.5px; font-weight: 700; }
+        .nav-item.active { color: var(--royal-blue); }
+
+        .overlay { position: absolute; inset: 0; background: rgba(7, 15, 43, 0.65); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 10000; }
+        .modal { background: #FFFFFF; padding: 28px 22px; border-radius: 26px; width: 86%; max-width: 330px; text-align: center; box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25); max-height:80vh; overflow-y:auto; animation: smoothReveal 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .modal-icon { font-size: 50px; margin-bottom: 14px; }
+        .modal h3 { font-size: 19px; font-weight: 800; margin-bottom: 6px; }
+        .modal p { font-size: 13.5px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.5; white-space:pre-wrap; text-align:left; }
+        .modal p.center-text { text-align:center; }
+        .empty-state { text-align: center; padding: 32px 20px; color: var(--text-muted); animation: softFadeIn 0.3s ease; }
+
+        /* Task Redirect Loader */
+        #task-redirect-loader {
+            position: absolute; inset: 0; background: rgba(7, 15, 43, 0.85); backdrop-filter: blur(6px);
+            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10001; color: white; text-align: center;
+        }
+        .redirect-spinner {
+            width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.2); border-top-color: var(--royal-blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px;
+        }
+        .redirect-text { font-size: 18px; font-weight: 800; margin-bottom: 16px; line-height: 1.4; }
+        .redirect-retry-btn {
+            background: var(--royal-gradient); color: #fff; border: none; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; display: none; box-shadow: var(--shadow-btn);
+        }
+        .redirect-cancel-btn {
+            background: transparent; color: #94A3B8; border: none; padding: 8px 16px; margin-top: 8px; font-size: 13px; cursor: pointer; display: none; text-decoration: underline;
+        }
     </style>
 </head>
 <body>
 
-    <div class="glass-card" id="mainCard">
-        <h2>Request App Link</h2>
-        
-        <form id="appForm">
-            <!-- 1. Full Name -->
-            <div class="form-group">
-                <input type="text" id="fullName" placeholder="Your Full Name" required>
-            </div>
+<div id="app-container">
 
-            <!-- 2. Email with Instruction Above -->
-            <div class="form-group">
-                <span class="email-instruction">Enter the email and whatsapp where you want to receive the app link
-</span>
-                <input type="email" id="email" placeholder="Enter your Email" required>
-            </div>
-
-            <!-- 3. WhatsApp Number -->
-            <div class="form-group">
-                <input type="tel" id="contact" placeholder="Your WhatsApp Number" required pattern="[0-9]{10,}" title="Please enter a valid mobile number">
-            </div>
-
-            <!-- 4. App Name (Replaced Dropdown) -->
-            <div class="form-group">
-                <input type="text" id="appName" placeholder="Link on WhatsApp or Gmail" required>
-            </div>
-
-            <!-- 5. Submit Button -->
-            <button type="submit" class="submit-btn" id="submitBtn">Request App Link</button>
-        </form>
-
-        <!-- Success Animation Container -->
-        <div class="success-message" id="successMsg">
-            <div class="tick-circle">
-                <span class="tick-icon">✔</span>
-            </div>
-            <p class="success-text">Your request has been submitted!</p>
-            <p style="font-size: 0.9rem; color: #ccc; margin-top: 10px;">Redirecting to WhatsApp...</p>
+    <!-- SPLASH SCREEN -->
+    <div id="loading-overlay">
+        <div class="splash-logo-wrap">
+            <img src="earnpro-logo.png" class="splash-logo" alt="EarnPro" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10484/10484293.png'">
+        </div>
+        <div class="splash-title">EarnPro</div>
+        <div class="splash-subtitle">Earn More. Grow More.</div>
+        <div class="splash-loader-box">
+            <div class="spinner"></div>
+            <div class="splash-loading-text">Loading...</div>
         </div>
     </div>
 
-    <!-- --- 5. FIREBASE & LOGIC --- -->
-    <script type="module">
-        // Import Firebase SDK (CDN)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, push, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen" class="screen no-nav active">
+        <div class="auth-wrapper">
+            <div id="login-top-hero">
+                <div class="auth-brand-top">
+                    <img src="earnpro-logo.png" alt="EarnPro" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10484/10484293.png'">
+                    <div class="auth-brand-name">EarnPro</div>
+                    <div class="auth-portal-sub">User Portal</div>
+                </div>
+                <div class="auth-welcome-box">
+                    <h2 id="auth-title">Welcome Back!</h2>
+                    <p id="auth-subtitle">Login to continue your journey</p>
+                </div>
+            </div>
 
-        // TODO: Replace this with your actual Firebase Project Config
-        const firebaseConfig = {
-  apiKey: "AIzaSyBigXJAo1FmpxH4c2gifUCoBJe2hltaoTE",
-  authDomain: "repli-mate.firebaseapp.com",
-  databaseURL: "https://repli-mate-default-rtdb.firebaseio.com",
-  projectId: "repli-mate",
-  storageBucket: "repli-mate.firebasestorage.app",
-  messagingSenderId: "316690019973",
-  appId: "1:316690019973:web:44c4595e329fb0994bdbec"
-};
+            <div id="reg-top-hero" class="reg-top-hero">
+                <div class="reg-back-btn" onclick="resetAuthUI()"><i class="fa-solid fa-arrow-left"></i></div>
+                <div class="reg-hero-row">
+                    <div class="reg-hero-text">
+                        <h2>Create Account</h2>
+                        <p>Join EarnPro and start earning today</p>
+                    </div>
+                    <img src="gift-box.png" id="reg-illustration" class="reg-gift-img" alt="Gift Box" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4213/4213958.png'">
+                </div>
+            </div>
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+            <div class="auth-tabs" id="auth-tabs-bar">
+                <div class="auth-tab active" id="tab-login" onclick="if(!isLoginMode) resetAuthUI()">Login</div>
+                <div class="auth-tab" id="tab-register" onclick="if(isLoginMode) handleAuthSwitch()">Register</div>
+            </div>
 
-        // Form Handling
-        const form = document.getElementById('appForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const successMsg = document.getElementById('successMsg');
+            <div class="auth-card">
+                <form id="auth-form">
+                    <div id="reg-fields" style="display: none;">
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <i class="fa-regular fa-user left-icon"></i>
+                                <input type="text" id="auth-name" placeholder="Full Name">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-mobile-screen left-icon"></i>
+                                <input type="tel" id="auth-mobile" placeholder="Mobile Number (10 Digits)">
+                            </div>
+                        </div>
+                    </div>
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
+                    <div class="input-group">
+                        <div class="input-wrapper">
+                            <i class="fa-regular fa-envelope left-icon"></i>
+                            <input type="email" id="auth-email" placeholder="Email Address" required>
+                        </div>
+                    </div>
 
-            // Animation Loading
-            const originalBtnText = submitBtn.innerText;
-            submitBtn.innerText = "Sending...";
-            submitBtn.style.opacity = "0.7";
-            submitBtn.disabled = true;
+                    <div class="input-group">
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock left-icon"></i>
+                            <input type="password" id="auth-password" placeholder="Password" required>
+                            <i class="fa-regular fa-eye-slash right-icon" onclick="togglePassVisibility('auth-password', this)"></i>
+                        </div>
+                    </div>
 
-            // Get Data
-            const name = document.getElementById('fullName').value;
-            const email = document.getElementById('email').value;
-            const contact = document.getElementById('contact').value;
-            const appReq = document.getElementById('appName').value;
+                    <div id="confirm-field" style="display: none;" class="input-group">
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock left-icon"></i>
+                            <input type="password" id="auth-confirm" placeholder="Confirm Password">
+                        </div>
+                    </div>
 
-            // Reference to 'users' node
-            const userListRef = ref(db, 'users');
-            const newPostRef = push(userListRef);
+                    <div id="forgot-pass-container" class="auth-options-row">
+                        <label class="remember-label">
+                            <input type="checkbox" checked> Remember Me
+                        </label>
+                        <button type="button" class="forgot-link" onclick="forgotPassword()">Forgot Password?</button>
+                    </div>
 
-            // Save to Firebase Realtime Database
-            set(newPostRef, {
-                name: name,
-                email: email,
-                contact: contact,
-                appName: appReq,
-                timestamp: serverTimestamp()
-            })
-            .then(() => {
-                // 6. WhatsApp Auto-Send Logic
-                const waNumber = "9891504624";
-                const text = `*New App Request*\n\nName: ${name}\nEmail: ${email}\nWhatsApp: ${contact}\nApp Required: ${appReq}`;
-                const encodedText = encodeURIComponent(text);
-                const waUrl = `https://wa.me/${waNumber}?text=${encodedText}`;
+                    <div id="reg-inline-consents" class="reg-consent-box">
+                        <label class="consent-item">
+                            <input type="checkbox" id="inline-chk-privacy" checked>
+                            <span>I agree to the <a href="#" onclick="event.preventDefault(); viewLegal('Privacy Policy')">Privacy Policy</a></span>
+                        </label>
+                        <label class="consent-item">
+                            <input type="checkbox" id="inline-chk-terms" checked>
+                            <span>I agree to the <a href="#" onclick="event.preventDefault(); viewLegal('Terms & Conditions')">Terms & Conditions</a></span>
+                        </label>
+                    </div>
 
-                // 7. Success Animation
-                form.style.display = 'none';
-                successMsg.style.display = 'flex';
-                createConfetti();
+                    <button type="submit" class="btn-royal" id="auth-btn">Login</button>
+                </form>
+            </div>
 
-                // Redirect to WhatsApp after short delay
-                setTimeout(() => {
-                    window.open(waUrl, '_blank');
-                }, 1500);
+            <div class="auth-footer-switch">
+                <span id="auth-switch-text">Don't have an account?</span>
+                <button type="button" id="auth-switch-btn" onclick="handleAuthSwitch()">Register</button>
+            </div>
+        </div>
+    </div>
 
-                // Reset (Optional reload or form clear)
-                setTimeout(() => {
-                     // form.reset(); 
-                     // form.style.display = 'block';
-                     // successMsg.style.display = 'none';
-                     // submitBtn.innerText = originalBtnText;
-                     // submitBtn.disabled = false;
-                     // submitBtn.style.opacity = "1";
-                }, 5000); 
-            })
-            .catch((error) => {
-                alert("Error: " + error.message);
-                submitBtn.innerText = originalBtnText;
-                submitBtn.disabled = false;
-                submitBtn.style.opacity = "1";
-            });
-        });
+    <!-- HOME SCREEN -->
+    <div id="home-screen" class="screen">
+        <div class="home-dark-hero">
+            <div class="home-top-bar">
+                <div class="home-brand-row">
+                    <img src="earnpro-logo.png" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10484/10484293.png'">
+                    <div class="home-brand-title">EarnPro</div>
+                    <span id="home-greeting" style="display:none;">User</span>
+                </div>
+            </div>
 
-        // Simple Confetti Effect
-        function createConfetti() {
-            const colors = ['#00d2ff', '#00ff88', '#ffffff'];
-            for (let i = 0; i < 50; i++) {
-                const conf = document.createElement('div');
-                conf.classList.add('confetti');
-                conf.style.left = Math.random() * 100 + 'vw';
-                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                conf.style.animationDuration = Math.random() * 2 + 1 + 's';
-                conf.style.top = '-10px';
-                document.body.appendChild(conf);
-                
-                // Remove after animation
-                setTimeout(() => {
-                    conf.remove();
-                }, 3000);
+            <div class="home-wallet-card">
+                <div class="home-wallet-left">
+                    <div class="wallet-mini-logo">
+                        <img src="earnpro-logo.png" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10484/10484293.png'">
+                    </div>
+                    <div>
+                        <div class="wallet-meta-label">My Wallet</div>
+                        <div class="wallet-meta-amount" id="home-balance"><span class="val-skeleton sk-shimmer-dark" style="width:78px; height:26px;"></span></div>
+                        <div class="wallet-meta-unit">Coins</div>
+                    </div>
+                </div>
+                <button class="withdraw-pill-btn" onclick="showScreen('wallet-screen'); setActiveNav('nav-profile');">
+                    Withdraw <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="home-sheet-body">
+            <div class="progress-card">
+                <div class="progress-info">
+                    <div class="progress-title">Your Progress</div>
+                    <div class="progress-sub"><strong id="home-progress-text"><span class="val-skeleton sk-shimmer" style="width:72px; height:15px; border-radius:5px;"></span></strong> Completed</div>
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-fill" id="home-progress-bar"></div>
+                    </div>
+                </div>
+                <img src="achievement-star.png" class="progress-star-img lazy-img" alt="Star" onload="markImgLoaded(this)" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1828/1828884.png'; markImgLoaded(this);">
+            </div>
+
+            <div class="sec-head">
+                <h3>Categories</h3>
+                <span onclick="setCategory('All Tasks')">View All &gt;</span>
+            </div>
+
+            <div class="category-tiles-grid" id="category-filter"></div>
+
+            <div class="sec-head">
+                <h3>Available Tasks</h3>
+                <span onclick="loadTasks(true)" id="tasks-refresh-btn">Refresh <i class="fa-solid fa-rotate-right" id="tasks-refresh-icon" style="font-size:11px;"></i></span>
+            </div>
+            <div class="task-list" id="main-tasks"></div>
+            
+            <div id="tasks-inline-loader" class="inline-loader-pill">
+                <div class="mini-spinner"></div>
+                <span>Loading more tasks...</span>
+            </div>
+            <div id="tasks-sentinel" style="height: 8px;"></div>
+        </div>
+    </div>
+
+    <!-- TASK DETAIL SCREEN -->
+    <div id="task-detail-screen" class="screen no-nav">
+        <div class="top-light-nav">
+            <div class="circle-icon-btn" onclick="showScreen('home-screen')"><i class="fa-solid fa-arrow-left"></i></div>
+            <div style="font-weight:800; font-size:16px;" id="task-detail-header-title">Task Details</div>
+            <div style="width:38px;"></div>
+        </div>
+
+        <div class="task-hero-center">
+            <div class="task-hero-icon-shell img-sk-wrap" id="detail-icon-wrap">
+                <img id="detail-icon" class="hero-3d-icon lazy-img" src="gaming-controller.png" alt="Task Icon" onload="markImgLoaded(this)" onerror="this.src='https://cdn-icons-png.flaticon.com/512/808/808439.png'; markImgLoaded(this);">
+            </div>
+            <h2 id="detail-title"><span class="val-skeleton sk-shimmer" style="width:160px; height:24px;"></span></h2>
+            <div class="task-cat-pill" id="detail-cat-badge">Offer</div>
+            <p id="detail-desc"><span class="val-skeleton sk-shimmer" style="width:220px; height:14px;"></span></p>
+        </div>
+
+        <div class="gold-reward-banner">
+            <div class="gold-coin-circle"><i class="fa-solid fa-coins"></i></div>
+            <div class="gold-reward-text">
+                <span>Total Reward</span>
+                <strong><span id="detail-total-reward"><span class="val-skeleton sk-shimmer-gold" style="width:65px; height:20px;"></span></span> Coins</strong>
+            </div>
+        </div>
+
+        <!-- TASK JOIN VIEW -->
+        <div id="task-join-view" style="display:none; padding: 0 20px 24px;">
+            <h4 style="font-size:15.5px; font-weight:800; margin-bottom:12px; color:var(--royal-blue);">Task Registration</h4>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Please confirm your details to start earning from this specific task.</p>
+            <div class="auth-card smooth-item" style="box-shadow:var(--shadow-card); border: 1.5px solid var(--input-border);">
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-user left-icon"></i>
+                        <input type="text" id="join-name" placeholder="Full Name" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-mobile-screen left-icon"></i>
+                        <input type="tel" id="join-mobile" placeholder="Mobile Number (10 Digits)" required>
+                    </div>
+                </div>
+                <button type="button" class="btn-royal" id="join-task-btn" onclick="submitTaskJoin()" style="margin-top:10px;">Register & Start Task</button>
+            </div>
+        </div>
+
+        <!-- TASK PROGRESS VIEW -->
+        <div id="task-progress-view" style="display:none;">
+            <div id="task-referral-box" class="gold-reward-banner" style="display:none; flex-direction: column; align-items:flex-start; padding: 14px; gap: 10px; margin-bottom: 20px;">
+                <div style="font-size:12.5px; font-weight:700; color:#92400E;">Referral Code Required</div>
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <strong id="task-ref-code-display" style="font-size:18px; color:#451A03; letter-spacing:1px; background:#FFE082; padding:4px 10px; border-radius:8px;"></strong>
+                    <button onclick="copyTaskReferral()" style="background:#D97706; color:#fff; border:none; padding:8px 14px; border-radius:10px; font-weight:800; cursor:pointer;">Copy</button>
+                </div>
+            </div>
+
+            <div class="task-rules-box" id="task-rules-container">
+                <h4>Task Rules:</h4>
+                <ul class="rules-list" id="task-rules-list"></ul>
+            </div>
+
+            <div class="stages-container">
+                <div id="task-complete-banner" class="task-complete-banner">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <h3>TASK FULLY COMPLETE</h3>
+                    <p>You have earned all rewards for this task.</p>
+                </div>
+
+                <h4 id="stages-count-heading">Stages</h4>
+                <div id="task-timeline"></div>
+            </div>
+            
+            <div class="sticky-stage-cta" id="detail-bottom-cta"></div>
+        </div>
+    </div>
+
+    <!-- MY WALLET SCREEN -->
+    <div id="wallet-screen" class="screen">
+        <div class="top-light-nav">
+            <div class="circle-icon-btn" onclick="showScreen('home-screen'); setActiveNav('nav-home');"><i class="fa-solid fa-arrow-left"></i></div>
+            <div style="font-size:18px; font-weight:800;">My Wallet</div>
+            <div class="circle-icon-btn" onclick="showScreen('withdraw-screen')" title="Withdraw"><i class="fa-solid fa-bolt" style="color:var(--royal-blue);"></i></div>
+        </div>
+
+        <div class="wallet-hero-card" onclick="showScreen('withdraw-screen')" style="cursor:pointer;">
+            <div class="w-label">Current Balance</div>
+            <div class="w-balance" id="wallet-balance"><span class="val-skeleton sk-shimmer-dark" style="width:110px; height:36px;"></span></div>
+            <div class="w-unit">Coins</div>
+            <img src="coin-stack.png" class="wallet-coins-3d lazy-img" alt="Coins" onload="markImgLoaded(this)" onerror="this.src='https://cdn-icons-png.flaticon.com/512/272/272525.png'; markImgLoaded(this);">
+        </div>
+
+        <div style="padding: 0 20px 16px;">
+            <button class="btn-royal" onclick="showScreen('withdraw-screen')">
+                <i class="fa-solid fa-paper-plane"></i> Request Withdrawal
+            </button>
+        </div>
+
+        <div class="sec-head" style="padding: 0 20px;">
+            <h3>Transaction History</h3>
+        </div>
+        <div class="history-list" id="history-list"></div>
+        <div id="history-inline-loader" class="inline-loader-pill">
+            <div class="mini-spinner"></div>
+            <span>Loading older transactions...</span>
+        </div>
+        <div id="history-sentinel" style="height: 8px;"></div>
+    </div>
+
+    <!-- REQUEST WITHDRAWAL SCREEN (Custom Input, Min 30 limit) -->
+    <div id="withdraw-screen" class="screen no-nav">
+        <div class="dark-top-header">
+            <div class="back-arrow" onclick="showScreen('wallet-screen')"><i class="fa-solid fa-chevron-left"></i></div>
+            <div class="title">Request Withdrawal</div>
+            <div style="width:36px;"></div>
+        </div>
+
+        <div class="withdraw-hero-center">
+            <img src="coin-stack.png" class="withdraw-3d-icon lazy-img" alt="Wallet" onload="markImgLoaded(this)" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1041/1041888.png'; markImgLoaded(this);">
+            <h2>Request Withdrawal</h2>
+        </div>
+
+        <div class="withdraw-white-sheet">
+            <div class="avail-balance-box">
+                <span>Available Balance</span>
+                <strong><span id="withdraw-avail-balance"><span class="val-skeleton sk-shimmer-gold" style="width:76px; height:24px;"></span></span> Coins</strong>
+            </div>
+
+            <!-- Custom amount input (Replaced chips) -->
+            <div class="input-group" style="margin-bottom:18px;">
+                <label style="display:block; font-size:13px; font-weight:800; margin-bottom:8px; color:var(--text-dark);">Coins to Withdraw</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-coins left-icon" style="color: #F59E0B;"></i>
+                    <input type="number" id="withdraw-custom-amount" placeholder="Enter Amount (Min 30 Coins)" min="30">
+                </div>
+            </div>
+
+            <div class="wd-method-tabs">
+                <div class="wd-tab selected" id="wd-upi" onclick="selectWithdraw('upi')">
+                    <i class="fa-solid fa-building-columns"></i> Bank / UPI
+                </div>
+                <div class="wd-tab" id="wd-playstore" onclick="selectWithdraw('playstore')">
+                    <i class="fa-brands fa-google-play"></i> Play Code
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-bottom:20px;">
+                <label id="withdraw-label" style="display:block; font-size:13px; font-weight:800; margin-bottom:8px; color:var(--text-dark);">UPI ID</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-at left-icon"></i>
+                    <input type="text" id="withdraw-input" placeholder="user@okaxis">
+                </div>
+            </div>
+
+            <button class="btn-royal" id="submit-wd-btn" onclick="requestWithdraw()">Submit Request</button>
+            <div style="text-align:center; font-size:12px; color:var(--text-muted); margin-top:14px; font-weight:600;">
+                Min limit: 30 Coins
+            </div>
+        </div>
+    </div>
+
+    <!-- LEADERBOARD SCREEN -->
+    <div id="leaderboard-screen" class="screen">
+        <div class="dark-top-header">
+            <div class="back-arrow" onclick="showScreen('home-screen'); setActiveNav('nav-home');"><i class="fa-solid fa-chevron-left"></i></div>
+            <div class="title">Leaderboard</div>
+            <div style="width:36px;"></div>
+        </div>
+
+        <div class="lb-toggle-pills">
+            <div class="lb-pill active" onclick="switchLbTab(this)">All Users</div>
+            <div class="lb-pill" onclick="switchLbTab(this)">This Month</div>
+        </div>
+
+        <div class="podium-stage" id="lb-podium"></div>
+
+        <div class="lb-sheet">
+            <div id="lb-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+            <div id="lb-inline-loader" class="inline-loader-pill">
+                <div class="mini-spinner"></div>
+                <span>Loading more ranks...</span>
+            </div>
+            <div id="lb-sentinel" style="height: 8px;"></div>
+            <div class="lb-you-bar">
+                <div style="display:flex; align-items:center; gap:10px; font-weight:800; color:#451A03;">
+                    <i class="fa-solid fa-crown" style="color:#D97706; font-size:18px;"></i>
+                    <span>You (Rank #<span id="stat-rank"><span class="val-skeleton sk-shimmer-gold" style="width:24px; height:16px; min-width:24px;"></span></span>)</span>
+                </div>
+                <div style="font-weight:800; font-size:16px; color:#451A03;" id="lb-you-score"><span class="val-skeleton sk-shimmer-gold" style="width:52px; height:18px; min-width:52px;"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE SCREEN -->
+    <div id="profile-screen" class="screen">
+        <div class="profile-royal-hero">
+            <div class="profile-ava-ring" id="profile-initial"><span class="mini-spinner"></span></div>
+            <div class="profile-name" id="profile-name"><span class="val-skeleton sk-shimmer-dark" style="width:140px; height:24px;"></span></div>
+            <div class="profile-sub-badge" id="profile-email"><span class="val-skeleton sk-shimmer-dark" style="width:170px; height:14px;"></span></div>
+        </div>
+
+        <div class="profile-body-sheet">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-completed"><span class="val-skeleton sk-shimmer" style="width:36px; height:22px; min-width:36px;"></span></div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-pending"><span class="val-skeleton sk-shimmer" style="width:36px; height:22px; min-width:36px;"></span></div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-rejected"><span class="val-skeleton sk-shimmer" style="width:36px; height:22px; min-width:36px;"></span></div>
+                    <div class="stat-label">Rejected</div>
+                </div>
+            </div>
+
+            <div class="gold-reward-banner" style="margin: 0 0 16px;">
+                <div class="gold-coin-circle"><i class="fa-solid fa-coins"></i></div>
+                <div class="gold-reward-text">
+                    <span>Total Earned</span>
+                    <strong><span id="stat-earned"><span class="val-skeleton sk-shimmer-gold" style="width:68px; height:20px;"></span></span> Coins</strong>
+                </div>
+            </div>
+
+            <div class="menu-list">
+                <div class="menu-item" onclick="showScreen('wallet-screen')">
+                    <div class="left"><i class="fa-solid fa-wallet"></i> <span>My Earnings</span></div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="showScreen('home-screen'); setActiveNav('nav-tasks');">
+                    <div class="left"><i class="fa-solid fa-clipboard-check"></i> <span>Task Activity</span></div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="showScreen('wallet-screen')">
+                    <div class="left"><i class="fa-solid fa-clock-rotate-left"></i> <span>Transaction History</span></div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="showScreen('leaderboard-screen'); setActiveNav('nav-leaderboard');">
+                    <div class="left"><i class="fa-solid fa-trophy"></i> <span>Leaderboard</span></div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="showScreen('support-screen')">
+                    <div class="left"><i class="fa-solid fa-headset"></i> <span>Help &amp; Support</span></div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="showScreen('settings-screen')">
+                    <div class="left"><i class="fa-solid fa-gear"></i> <span>Settings</span></div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="viewLegal('Privacy Policy')">
+                    <div class="left"><i class="fa-solid fa-shield-halved"></i> <span>Privacy Policy</span></div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="viewLegal('Terms & Conditions')">
+                    <div class="left"><i class="fa-solid fa-file-contract"></i> <span>Terms &amp; Conditions</span></div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="menu-item" onclick="logout()" style="color:var(--danger);">
+                    <div class="left"><i class="fa-solid fa-right-from-bracket" style="color:var(--danger);"></i> <span>Logout</span></div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS & SUPPORT -->
+    <div id="settings-screen" class="screen no-nav">
+        <div class="dark-top-header">
+            <div class="back-arrow" onclick="showScreen('profile-screen')"><i class="fa-solid fa-chevron-left"></i></div>
+            <div class="title">Settings</div>
+            <div style="width:36px;"></div>
+        </div>
+
+        <div class="withdraw-hero-center">
+            <div style="width:68px; height:68px; border-radius:50%; background:rgba(59,130,246,0.25); display:flex; align-items:center; justify-content:center; margin:0 auto 10px; font-size:30px; color:#60A5FA;">
+                <i class="fa-solid fa-gear"></i>
+            </div>
+            <h2>Settings</h2>
+        </div>
+
+        <div class="settings-sheet">
+            <div class="setting-row-card" onclick="openSupport()">
+                <div class="setting-row-left">
+                    <i class="fa-brands fa-whatsapp" style="color:#22C55E; font-size:24px;"></i>
+                    <div>
+                        <div class="st-name">WhatsApp Support</div>
+                        <div class="st-sub" style="color:var(--text-dark);" id="settings-wa-num"><span class="val-skeleton sk-shimmer" style="width:95px; height:12px;"></span></div>
+                    </div>
+                </div>
+                <i class="fa-solid fa-toggle-on" style="font-size:28px; color:#22C55E;"></i>
+            </div>
+            <div class="setting-row-card" onclick="viewLegal('Privacy Policy')">
+                <div class="setting-row-left">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <div>
+                        <div class="st-name">Privacy Policy</div>
+                        <div class="st-sub">View Document</div>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="color:#94A3B8; font-size:13px;"></i>
+            </div>
+            <div class="setting-row-card" onclick="viewLegal('Terms & Conditions')">
+                <div class="setting-row-left">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <div>
+                        <div class="st-name">Terms &amp; Conditions</div>
+                        <div class="st-sub">View Document</div>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="color:#94A3B8; font-size:13px;"></i>
+            </div>
+            <button class="btn-logout-soft" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div id="support-screen" class="screen no-nav">
+        <div class="top-light-nav">
+            <div class="circle-icon-btn" onclick="showScreen('profile-screen')"><i class="fa-solid fa-arrow-left"></i></div>
+            <div style="font-weight:800; font-size:16px;">Help &amp; Support</div>
+            <div style="width:38px;"></div>
+        </div>
+
+        <div class="task-hero-center" style="padding-top:16px;">
+            <div class="task-hero-icon-shell img-sk-wrap">
+                <img src="support-headset.png" class="hero-3d-icon lazy-img" alt="Support" onload="markImgLoaded(this)" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712109.png'; markImgLoaded(this);">
+            </div>
+            <h2>Help &amp; Support</h2>
+            <p>Our support team is here to assist you.</p>
+        </div>
+
+        <div class="whatsapp-big-btn" onclick="openSupport()">
+            <i class="fa-brands fa-whatsapp" style="font-size:30px;"></i>
+            <div style="text-align:left;">
+                <div style="font-size:15px; font-weight:800;">Chat on WhatsApp</div>
+                <div style="font-size:13px; opacity:0.9; font-weight:600;" id="support-wa-num"><span class="val-skeleton sk-shimmer-dark" style="width:95px; height:12px;"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAVBAR -->
+    <div id="navbar" style="display: none;">
+        <div class="nav-item active" id="nav-home" onclick="showScreen('home-screen'); setActiveNav('nav-home')">
+            <i class="fa-solid fa-house"></i><span>Home</span>
+        </div>
+        <div class="nav-item" id="nav-tasks" onclick="showScreen('home-screen'); setActiveNav('nav-tasks'); document.getElementById('main-tasks').scrollIntoView({behavior:'smooth'});">
+            <i class="fa-solid fa-clipboard-check"></i><span>Tasks</span>
+        </div>
+        <div class="nav-item" id="nav-leaderboard" onclick="showScreen('leaderboard-screen'); setActiveNav('nav-leaderboard')">
+            <i class="fa-solid fa-trophy"></i><span>Leaderboard</span>
+        </div>
+        <div class="nav-item" id="nav-profile" onclick="showScreen('profile-screen'); setActiveNav('nav-profile')">
+            <i class="fa-regular fa-user"></i><span>Profile</span>
+        </div>
+    </div>
+
+    <!-- GLOBAL ALERT MODAL -->
+    <div class="overlay" id="modal-overlay">
+        <div class="modal" id="alert-modal">
+            <i class="fa-solid fa-circle-check modal-icon" id="modal-icon" style="color: var(--success);"></i>
+            <h3 id="modal-title">Success</h3>
+            <p id="modal-desc" class="center-text">Action completed.</p>
+            <button class="btn-royal" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- TASK REDIRECT LOADER -->
+    <div id="task-redirect-loader">
+        <div class="redirect-spinner" id="redirect-spinner"></div>
+        <div class="redirect-text" id="redirect-text">
+            Redirecting to Task...<br>
+            <span style="font-size:13px; font-weight:500; margin-top:8px; display:block; opacity:0.9;">Please wait while we verify and redirect you.</span>
+        </div>
+        <button class="redirect-retry-btn" id="redirect-retry-btn" onclick="retryLastTask()">Retry</button>
+        <button class="redirect-cancel-btn" id="redirect-cancel-btn" onclick="closeRedirectLoader()">Cancel</button>
+    </div>
+
+</div>
+
+<script>
+    /* =========================================
+       FIREBASE CONFIGURATION
+       ========================================= */
+    const firebaseConfig = { 
+        apiKey: "AIzaSyC8QZSj5qSwoll2P09BCBThaJrSAMguoEI", 
+        authDomain: "battle-83eca.firebaseapp.com", 
+        databaseURL: "https://battle-83eca-default-rtdb.firebaseio.com", 
+        projectId: "battle-83eca", 
+        storageBucket: "battle-83eca.firebasestorage.app", 
+        messagingSenderId: "670708214835", 
+        appId: "1:670708214835:web:078123b1ad97cbaf924746" 
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    /* =========================================
+       GLOBAL STATE & CACHE VARIABLES
+       ========================================= */
+    let currentUser = null, isLoginMode = true, userBalance = 0, withdrawMethod = 'upi';
+    let allAvailableTasks = [], globalCategories = [], currentCategory = 'All Tasks';
+    let userTasksStatus = {}, userHistoryData = [], currentTaskOpen = null;
+    let appSettings = { supportWhatsApp: '', privacyPolicy: 'Standard Privacy Policy applies.', termsConditions: 'By using this app, you agree to fair task completion.' };
+    let leaderboardData = [];
+    let pendingTaskParams = null;
+
+    // Viewport Pagination State
+    const TASKS_PAGE_SIZE = 6;       
+    const HISTORY_PAGE_SIZE = 8;     
+    const LB_PAGE_SIZE = 25;       
+
+    let visibleTasksLimit = TASKS_PAGE_SIZE;
+    let visibleHistoryLimit = HISTORY_PAGE_SIZE;
+    let visibleLbLimit = LB_PAGE_SIZE;
+
+    let isTasksLoadedOnce = false;
+    let isUserTasksLoadedOnce = false;
+    let historyLoaded = false;
+    let historyFetchLimit = HISTORY_PAGE_SIZE;
+    let hasMoreHistoryInDb = true;
+    let isFetchingMoreHistory = false;
+
+    let lbLastFetchedAt = 0;
+    let lbFetchLimit = LB_PAGE_SIZE;
+    let hasMoreLbInDb = true;
+    let isFetchingMoreLb = false;
+
+    let activeDbListeners = [];
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
+    }
+
+    /* =========================================
+       INSTANT NUMBER RENDER
+       ========================================= */
+    function animateNumber(elOrId, targetValue) {
+        const el = typeof elOrId === 'string' ? document.getElementById(elOrId) : elOrId;
+        if (!el) return;
+        const target = Number(targetValue) || 0;
+        el.innerHTML = `<span class="smooth-item" style="display:inline-block;">${target.toLocaleString()}</span>`;
+    }
+
+    function markImgLoaded(imgEl) {
+        if (!imgEl) return;
+        imgEl.classList.add('is-loaded');
+        if (imgEl.parentElement && imgEl.parentElement.classList.contains('img-sk-wrap')) {
+            imgEl.parentElement.classList.add('loaded-wrap');
+        }
+    }
+
+    function setBtnLoading(btnId, isLoading, loadingText = 'Processing...', defaultText = '') {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        if (isLoading) {
+            btn.dataset.originalText = defaultText || btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<span class="mini-spinner white"></span> <span>${escapeHTML(loadingText)}</span>`;
+        } else {
+            btn.disabled = false;
+            if (defaultText) btn.innerHTML = defaultText;
+            else if (btn.dataset.originalText) btn.innerHTML = btn.dataset.originalText;
+        }
+    }
+
+    function getFriendlyError(err) {
+        const code = err.code || '';
+        if(code.includes('user-not-found') || code.includes('wrong-password') || code.includes('invalid-credential')) return 'Login failed: Please check your email and password.';
+        if(code.includes('network-request-failed')) return 'Connection issue: Unable to connect. Please try again.';
+        if(code.includes('email-already-in-use')) return 'Registration failed: This email is already registered.';
+        if(code.includes('too-many-requests')) return 'Too many attempts. Please try again later.';
+        return 'We could not process your request. Please try again.';
+    }
+
+    function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
+    function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
+
+    /* =========================================
+       DEDICATED SKELETON GENERATORS
+       ========================================= */
+    function renderInitialValueSkeletons() {
+        document.getElementById('home-balance').innerHTML = `<span class="val-skeleton sk-shimmer-dark" style="width:78px; height:26px;"></span>`;
+        document.getElementById('wallet-balance').innerHTML = `<span class="val-skeleton sk-shimmer-dark" style="width:110px; height:36px;"></span>`;
+        document.getElementById('withdraw-avail-balance').innerHTML = `<span class="val-skeleton sk-shimmer-gold" style="width:76px; height:24px;"></span>`;
+        document.getElementById('home-progress-text').innerHTML = `<span class="val-skeleton sk-shimmer" style="width:72px; height:15px; border-radius:5px;"></span>`;
+        document.getElementById('home-progress-bar').style.width = '0%';
+
+        document.getElementById('profile-initial').innerHTML = `<span class="mini-spinner"></span>`;
+        document.getElementById('profile-name').innerHTML = `<span class="val-skeleton sk-shimmer-dark" style="width:140px; height:24px;"></span>`;
+        document.getElementById('profile-email').innerHTML = `<span class="val-skeleton sk-shimmer-dark" style="width:170px; height:14px;"></span>`;
+
+        document.getElementById('stat-completed').innerHTML = `<span class="val-skeleton sk-shimmer" style="width:36px; height:22px; min-width:36px;"></span>`;
+        document.getElementById('stat-pending').innerHTML = `<span class="val-skeleton sk-shimmer" style="width:36px; height:22px; min-width:36px;"></span>`;
+        document.getElementById('stat-rejected').innerHTML = `<span class="val-skeleton sk-shimmer" style="width:36px; height:22px; min-width:36px;"></span>`;
+        document.getElementById('stat-earned').innerHTML = `<span class="val-skeleton sk-shimmer-gold" style="width:68px; height:20px;"></span>`;
+        document.getElementById('lb-you-score').innerHTML = `<span class="val-skeleton sk-shimmer-gold" style="width:52px; height:18px; min-width:52px;"></span>`;
+        document.getElementById('stat-rank').innerHTML = `<span class="val-skeleton sk-shimmer-gold" style="width:24px; height:16px; min-width:24px;"></span>`;
+    }
+
+    function renderCategorySkeletons() {
+        const container = document.getElementById('category-filter');
+        if (!container) return;
+        let html = '';
+        for (let i = 0; i < 4; i++) {
+            html += `
+                <div class="sk-cat-tile">
+                    <div class="sk-shimmer" style="width:44px; height:44px; border-radius:14px;"></div>
+                    <div class="sk-shimmer" style="width:48px; height:10px; border-radius:5px;"></div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
+    function renderTaskSkeletons(count = 4) {
+        const container = document.getElementById('main-tasks');
+        if (!container) return;
+        let html = '';
+        for (let i = 0; i < count; i++) {
+            html += `
+                <div class="sk-task-card">
+                    <div class="sk-icon-box sk-shimmer"></div>
+                    <div style="flex:1;">
+                        <div class="sk-line w-70 sk-shimmer"></div>
+                        <div class="sk-line w-90 sk-shimmer"></div>
+                        <div class="sk-line w-45 sk-shimmer"></div>
+                    </div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
+    function renderHistorySkeletons(count = 6) {
+        const container = document.getElementById('history-list');
+        if (!container) return;
+        let html = '';
+        for (let i = 0; i < count; i++) {
+            html += `
+                <div class="sk-history-item">
+                    <div class="sk-shimmer" style="width:42px; height:42px; border-radius:50%; flex-shrink:0;"></div>
+                    <div style="flex:1;">
+                        <div class="sk-line w-70 sk-shimmer" style="height:13px; margin-bottom:6px;"></div>
+                        <div class="sk-line w-45 sk-shimmer" style="height:10px;"></div>
+                    </div>
+                    <div class="sk-shimmer" style="width:52px; height:16px; border-radius:6px;"></div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
+    function renderLeaderboardSkeletons() {
+        const podium = document.getElementById('lb-podium');
+        const list = document.getElementById('lb-list');
+        if (podium) {
+            podium.innerHTML = `
+                <div class="podium-col rank-2">
+                    <div class="podium-ava-wrap"><div class="podium-ava sk-shimmer-dark" style="border-color:rgba(255,255,255,0.3);"></div></div>
+                    <div class="podium-pedestal" style="min-height:92px; opacity:0.65;"><div class="sk-shimmer" style="width:55px; height:12px; border-radius:6px; margin-top:18px;"></div></div>
+                </div>
+                <div class="podium-col rank-1">
+                    <div class="podium-ava-wrap"><div class="podium-ava sk-shimmer-dark" style="border-color:rgba(253,224,71,0.5);"></div></div>
+                    <div class="podium-pedestal" style="min-height:112px; opacity:0.65;"><div class="sk-shimmer" style="width:65px; height:12px; border-radius:6px; margin-top:24px;"></div></div>
+                </div>
+                <div class="podium-col rank-3">
+                    <div class="podium-ava-wrap"><div class="podium-ava sk-shimmer-dark" style="border-color:rgba(255,255,255,0.3);"></div></div>
+                    <div class="podium-pedestal" style="min-height:84px; opacity:0.65;"><div class="sk-shimmer" style="width:55px; height:12px; border-radius:6px; margin-top:14px;"></div></div>
+                </div>
+            `;
+        }
+        if (list) {
+            let html = '';
+            for (let i = 0; i < 5; i++) {
+                html += `
+                    <div class="lb-row">
+                        <div class="sk-shimmer" style="width:20px; height:14px; border-radius:4px; margin-right:14px;"></div>
+                        <div class="sk-shimmer" style="flex:1; height:14px; border-radius:6px; margin-right:24px;"></div>
+                        <div class="sk-shimmer" style="width:54px; height:14px; border-radius:6px;"></div>
+                    </div>
+                `;
+            }
+            list.innerHTML = html;
+        }
+    }
+
+    function renderTaskDetailSkeletons() {
+        const timeline = document.getElementById('task-timeline');
+        if (!timeline) return;
+        let html = '';
+        for (let i = 0; i < 3; i++) {
+            html += `
+                <div class="stage-card-row">
+                    <div class="sk-shimmer" style="width:32px; height:32px; border-radius:50%; flex-shrink:0;"></div>
+                    <div style="flex:1;">
+                        <div class="sk-line w-45 sk-shimmer" style="height:13px; margin-bottom:6px;"></div>
+                        <div class="sk-line w-90 sk-shimmer" style="height:11px; margin-bottom:0;"></div>
+                    </div>
+                    <div class="sk-shimmer" style="width:58px; height:14px; border-radius:6px;"></div>
+                </div>
+            `;
+        }
+        timeline.innerHTML = html;
+    }
+
+    /* =========================================
+       NAVIGATION & LAZY SCREEN TRIGGERS
+       ========================================= */
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        const nav = document.getElementById('navbar');
+        if (['auth-screen', 'task-detail-screen', 'withdraw-screen', 'settings-screen', 'support-screen'].includes(screenId)) {
+            nav.style.display = 'none';
+        } else {
+            nav.style.display = 'flex';
+        }
+
+        if (currentUser) {
+            if (screenId === 'wallet-screen' || screenId === 'profile-screen') {
+                ensureHistoryLoaded();
+            }
+            if (screenId === 'leaderboard-screen') {
+                ensureLeaderboardLoaded();
             }
         }
-    </script>
+    }
+
+    function setActiveNav(navId) {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const el = document.getElementById(navId);
+        if (el) el.classList.add('active');
+    }
+
+    function showAlert(title, desc, type = 'success') {
+        const icon = document.getElementById('modal-icon');
+        icon.className = 'fa-solid modal-icon ' + (type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-circle-xmark' : 'fa-circle-info');
+        icon.style.color = type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--royal-blue)';
+        document.getElementById('modal-title').innerText = escapeHTML(title);
+        
+        const descEl = document.getElementById('modal-desc');
+        descEl.innerText = desc;
+        descEl.className = (title === 'Privacy Policy' || title === 'Terms & Conditions') ? '' : 'center-text';
+        
+        document.getElementById('modal-overlay').style.display = 'flex';
+    }
+    function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
+
+    function togglePassVisibility(inputId, iconEl) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') { input.type = 'text'; iconEl.classList.replace('fa-eye-slash', 'fa-eye'); } 
+        else { input.type = 'password'; iconEl.classList.replace('fa-eye', 'fa-eye-slash'); }
+    }
+
+    /* =========================================
+       CACHING SYSTEM
+       ========================================= */
+    function loadDataFromCache() {
+        try {
+            if (localStorage.getItem('earnpro_balance')) {
+                userBalance = Number(localStorage.getItem('earnpro_balance'));
+                animateNumber('home-balance', userBalance);
+                animateNumber('wallet-balance', userBalance);
+                animateNumber('withdraw-avail-balance', userBalance);
+            }
+            if (localStorage.getItem('earnpro_cats')) {
+                globalCategories = JSON.parse(localStorage.getItem('earnpro_cats'));
+                renderCategories();
+            }
+            if (localStorage.getItem('earnpro_tasks')) {
+                allAvailableTasks = JSON.parse(localStorage.getItem('earnpro_tasks'));
+                isTasksLoadedOnce = true;
+                renderTasks();
+            }
+            if (localStorage.getItem('earnpro_history')) {
+                userHistoryData = JSON.parse(localStorage.getItem('earnpro_history'));
+                historyLoaded = true;
+            }
+        } catch(e) {}
+    }
+
+    /* =========================================
+       AUTHENTICATION 
+       ========================================= */
+    auth.onAuthStateChanged(user => {
+        if(user) {
+            renderInitialValueSkeletons();
+            if(allAvailableTasks.length === 0) { renderCategorySkeletons(); renderTaskSkeletons(4); }
+            
+            loadDataFromCache();
+            
+            showScreen('home-screen');
+            setActiveNav('nav-home');
+            hideLoading();
+
+            db.ref(`users/${user.uid}/profile`).once('value').then(snap => {
+                const p = snap.val() || {};
+                currentUser = { uid: user.uid, email: user.email, name: p.name || 'User', mobile: p.mobile || '' };
+                document.getElementById('home-greeting').innerText = escapeHTML(currentUser.name.split(' ')[0]);
+                document.getElementById('profile-name').innerHTML = `<span class="smooth-item">${escapeHTML(currentUser.name)}</span>`;
+                document.getElementById('profile-email').innerHTML = `<span class="smooth-item">${escapeHTML(currentUser.email)}</span>`;
+                document.getElementById('profile-initial').innerHTML = `<span class="smooth-item">${escapeHTML(currentUser.name.charAt(0).toUpperCase())}</span>`;
+                setupAppListeners();
+            }).catch(err => { hideLoading(); showAlert('Error', 'Failed to load profile. Connection issue.', 'error'); });
+        } else {
+            cleanupDbListeners();
+            hideLoading();
+            currentUser = null;
+            resetAuthUI();
+            showScreen('auth-screen');
+        }
+    });
+
+    function cleanupDbListeners() {
+        activeDbListeners.forEach(ref => ref.off());
+        activeDbListeners = [];
+        historyLoaded = false;
+        isTasksLoadedOnce = false;
+        isUserTasksLoadedOnce = false;
+        lbLastFetchedAt = 0;
+    }
+
+    function resetAuthUI() {
+        isLoginMode = true;
+        document.getElementById('login-top-hero').style.display = 'block';
+        document.getElementById('reg-top-hero').style.display = 'none';
+        document.getElementById('auth-tabs-bar').style.display = 'flex';
+        document.getElementById('tab-login').classList.add('active');
+        document.getElementById('tab-register').classList.remove('active');
+        document.getElementById('reg-fields').style.display = 'none';
+        document.getElementById('confirm-field').style.display = 'none';
+        document.getElementById('forgot-pass-container').style.display = 'flex';
+        document.getElementById('reg-inline-consents').style.display = 'none';
+        document.getElementById('auth-btn').innerText = 'Login';
+        document.getElementById('auth-btn').disabled = false;
+        document.getElementById('auth-switch-text').innerText = "Don't have an account?";
+        document.getElementById('auth-switch-btn').innerText = 'Register';
+    }
+
+    function handleAuthSwitch() {
+        if(isLoginMode) { switchToRegistrationMode(); } else { resetAuthUI(); }
+    }
+
+    function switchToRegistrationMode() {
+        isLoginMode = false;
+        document.getElementById('login-top-hero').style.display = 'none';
+        document.getElementById('reg-top-hero').style.display = 'block';
+        document.getElementById('auth-tabs-bar').style.display = 'none';
+        document.getElementById('reg-fields').style.display = 'block';
+        document.getElementById('confirm-field').style.display = 'block';
+        document.getElementById('forgot-pass-container').style.display = 'none';
+        document.getElementById('reg-inline-consents').style.display = 'flex';
+        document.getElementById('auth-btn').innerText = 'Register';
+        document.getElementById('auth-switch-text').innerText = 'Already have an account?';
+        document.getElementById('auth-switch-btn').innerText = 'Login';
+    }
+
+    document.getElementById('auth-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('auth-email').value.trim();
+        const password = document.getElementById('auth-password').value;
+        const defaultLabel = isLoginMode ? 'Login' : 'Register';
+        setBtnLoading('auth-btn', true, isLoginMode ? 'Signing in...' : 'Creating account...', defaultLabel);
+
+        if (isLoginMode) {
+            auth.signInWithEmailAndPassword(email, password).catch(err => { 
+                setBtnLoading('auth-btn', false, '', defaultLabel);
+                showAlert('Login Failed', getFriendlyError(err), 'error'); 
+            });
+        } else {
+            if (!document.getElementById('inline-chk-privacy').checked || !document.getElementById('inline-chk-terms').checked) {
+                setBtnLoading('auth-btn', false, '', defaultLabel);
+                showAlert('Required', 'Please agree to the Privacy Policy and Terms.', 'error'); return;
+            }
+            const name = document.getElementById('auth-name').value.trim();
+            const mobile = document.getElementById('auth-mobile').value.trim();
+            const confirm = document.getElementById('auth-confirm').value;
+
+            if(password !== confirm) { setBtnLoading('auth-btn', false, '', defaultLabel); showAlert('Error', 'Passwords do not match.', 'error'); return; }
+            if(!mobile || mobile.length !== 10 || isNaN(mobile)) { setBtnLoading('auth-btn', false, '', defaultLabel); showAlert('Error', 'Enter a valid 10-digit mobile number.', 'error'); return; }
+            if(!name) { setBtnLoading('auth-btn', false, '', defaultLabel); showAlert('Error', 'Please enter your full name.', 'error'); return; }
+
+            auth.createUserWithEmailAndPassword(email, password).then((cred) => {
+                return db.ref(`users/${cred.user.uid}/profile`).set({
+                    name, mobile, email,
+                    createdAt: firebase.database.ServerValue.TIMESTAMP,
+                    legalConsent: true
+                });
+            }).catch(err => { setBtnLoading('auth-btn', false, '', defaultLabel); showAlert('Error', getFriendlyError(err), 'error'); });
+        }
+    });
+
+    function forgotPassword() {
+        const email = document.getElementById('auth-email').value.trim();
+        if(!email) return showAlert('Required', 'Enter your email address first.', 'error');
+        showLoading();
+        auth.sendPasswordResetEmail(email).then(() => { 
+            hideLoading(); showAlert('Sent', 'Password reset instructions sent to your email.', 'success'); 
+        }).catch(err => { hideLoading(); showAlert('Error', getFriendlyError(err), 'error'); });
+    }
+    
+    function logout() { showLoading(); auth.signOut(); }
+
+    /* =========================================
+       DATA SYNCHRONIZATION & LISTENERS
+       ========================================= */
+    function setupAppListeners() {
+        cleanupDbListeners();
+        const uid = currentUser.uid;
+
+        try {
+            const cachedSettings = localStorage.getItem('earnpro_settings_cache');
+            if (cachedSettings) { appSettings = { ...appSettings, ...JSON.parse(cachedSettings) }; applySettingsUI(); }
+        } catch(e) {}
+
+        db.ref('settings').once('value').then(snap => {
+            if(snap.val()) {
+                appSettings = { ...appSettings, ...snap.val() };
+                applySettingsUI();
+                try { localStorage.setItem('earnpro_settings_cache', JSON.stringify(snap.val())); } catch(e) {}
+            } else { applySettingsUI(); }
+        }).catch(() => { applySettingsUI(); });
+
+        const balanceRef = db.ref(`users/${uid}/wallet/balance`);
+        balanceRef.on('value', snap => {
+            userBalance = Number(snap.val()) || 0;
+            localStorage.setItem('earnpro_balance', userBalance);
+            animateNumber('home-balance', userBalance);
+            animateNumber('wallet-balance', userBalance);
+            animateNumber('withdraw-avail-balance', userBalance);
+        });
+        activeDbListeners.push(balanceRef);
+
+        const userTasksRef = db.ref(`users/${uid}/tasks`);
+        userTasksRef.on('value', snap => {
+            userTasksStatus = snap.val() || {};
+            isUserTasksLoadedOnce = true;
+            calculateProfileStats();
+            if(currentTaskOpen) updateTaskDetailScreen();
+        });
+        activeDbListeners.push(userTasksRef);
+
+        const catRef = db.ref('categories');
+        catRef.on('value', snap => {
+            globalCategories = [];
+            snap.forEach(child => {
+                if(child.val().status !== 'inactive') {
+                    globalCategories.push({ id: child.key, ...child.val() });
+                }
+            });
+            localStorage.setItem('earnpro_cats', JSON.stringify(globalCategories));
+            renderCategories();
+        });
+        activeDbListeners.push(catRef);
+
+        loadTasks();
+        ensureHistoryLoaded(); 
+    }
+
+    function applySettingsUI() {
+        const waText = appSettings.supportWhatsApp ? escapeHTML(appSettings.supportWhatsApp) : 'Unavailable';
+        document.getElementById('settings-wa-num').innerHTML = `<span class="smooth-item">${waText}</span>`;
+        document.getElementById('support-wa-num').innerHTML = `<span class="smooth-item">${waText}</span>`;
+    }
+
+    function ensureHistoryLoaded(loadMore = false) {
+        if (!currentUser) return;
+        if (historyLoaded && !loadMore) { renderHistory(); return; }
+
+        const inlineLoader = document.getElementById('history-inline-loader');
+
+        if (!historyLoaded && userHistoryData.length === 0) {
+            renderHistorySkeletons(5);
+            historyFetchLimit = HISTORY_PAGE_SIZE;
+        } else if (loadMore) {
+            if (!hasMoreHistoryInDb || isFetchingMoreHistory) return;
+            isFetchingMoreHistory = true;
+            if (inlineLoader) inlineLoader.classList.add('show');
+            historyFetchLimit += HISTORY_PAGE_SIZE;
+        }
+
+        const uid = currentUser.uid;
+        const historyRef = db.ref(`users/${uid}/history`).orderByChild('timestamp').limitToLast(historyFetchLimit);
+        
+        historyRef.off();
+        historyRef.on('value', snap => {
+            userHistoryData = [];
+            snap.forEach(child => { userHistoryData.push({ id: child.key, ...child.val() }); });
+            hasMoreHistoryInDb = userHistoryData.length >= historyFetchLimit;
+            userHistoryData.reverse();
+            localStorage.setItem('earnpro_history', JSON.stringify(userHistoryData));
+
+            visibleHistoryLimit = historyFetchLimit;
+            historyLoaded = true;
+            isFetchingMoreHistory = false;
+            if (inlineLoader) inlineLoader.classList.remove('show');
+            renderHistory();
+            calculateProfileStats();
+        });
+        activeDbListeners.push(historyRef);
+    }
+
+    /* LEADERBOARD FETCHING */
+    function ensureLeaderboardLoaded(loadMore = false) {
+        const now = Date.now();
+        const inlineLoader = document.getElementById('lb-inline-loader');
+
+        if (currentUser && !loadMore) {
+            let currentScore = userBalance;
+            if (historyLoaded) {
+                let tempEarned = 0;
+                userHistoryData.forEach(h => { if (h.type !== 'withdraw' && (h.amount > 0)) tempEarned += Number(h.amount); });
+                currentScore = tempEarned;
+            }
+            db.ref(`publicLeaderboard/${currentUser.uid}`).update({
+                name: currentUser.name,
+                lifetimeEarnings: currentScore,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            }).catch(e=>{});
+        }
+
+        if (!loadMore && leaderboardData.length > 0 && (now - lbLastFetchedAt < 180000)) {
+            renderLeaderboard();
+            return;
+        }
+
+        if (!loadMore && leaderboardData.length === 0) {
+            renderLeaderboardSkeletons();
+            lbFetchLimit = LB_PAGE_SIZE;
+        } else if (loadMore) {
+            if (!hasMoreLbInDb || isFetchingMoreLb) return;
+            isFetchingMoreLb = true;
+            if (inlineLoader) inlineLoader.classList.add('show');
+            lbFetchLimit += LB_PAGE_SIZE;
+        }
+
+        db.ref('publicLeaderboard').orderByChild('lifetimeEarnings').limitToLast(lbFetchLimit).once('value').then(snap => {
+            leaderboardData = [];
+            snap.forEach(child => { leaderboardData.push({ uid: child.key, ...child.val() }); });
+            hasMoreLbInDb = leaderboardData.length >= lbFetchLimit;
+            leaderboardData.reverse();
+            visibleLbLimit = lbFetchLimit;
+            lbLastFetchedAt = Date.now();
+            isFetchingMoreLb = false;
+            if (inlineLoader) inlineLoader.classList.remove('show');
+            renderLeaderboard();
+        }).catch(() => {
+            isFetchingMoreLb = false;
+            if (inlineLoader) inlineLoader.classList.remove('show');
+        });
+    }
+
+    /* =========================================
+       FIXED: AUTOMATIC LEADERBOARD SYNC
+       ========================================= */
+    function calculateProfileStats() {
+        if (!isUserTasksLoadedOnce && !isTasksLoadedOnce) return;
+
+        let completedTasks = 0, pendingStages = 0, rejectedStages = 0, lifetimeEarned = 0;
+        
+        Object.keys(userTasksStatus).forEach(taskId => {
+            const task = allAvailableTasks.find(t => t.id === taskId);
+            const userTask = userTasksStatus[taskId];
+            if (userTask.stageStatus === 'pending') pendingStages++;
+            if (userTask.stageStatus === 'rejected') rejectedStages++;
+            
+            if (task && task.stages) {
+                const currentStage = userTask.currentStage || 0;
+                const status = userTask.stageStatus || userTask.status;
+                if (currentStage >= task.stages.length) {
+                    completedTasks++;
+                } else if ((status === 'completed' || status === 'approved') && currentStage === task.stages.length - 1) {
+                    completedTasks++;
+                }
+            }
+        });
+        userHistoryData.forEach(h => { if (h.type !== 'withdraw' && (h.amount > 0)) lifetimeEarned += Number(h.amount); });
+
+        animateNumber('stat-completed', completedTasks);
+        animateNumber('stat-pending', pendingStages);
+        animateNumber('stat-rejected', rejectedStages);
+
+        if (historyLoaded) {
+            animateNumber('stat-earned', lifetimeEarned);
+            animateNumber('lb-you-score', lifetimeEarned);
+
+            // UPDATE LEADERBOARD IN FIREBASE AUTOMATICALLY
+            if (currentUser) {
+                db.ref(`publicLeaderboard/${currentUser.uid}`).update({
+                    name: currentUser.name,
+                    lifetimeEarnings: lifetimeEarned,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                }).catch(err => console.log("LB Sync Error:", err));
+            }
+        }
+
+        if (isTasksLoadedOnce) {
+            const totalAvail = Math.max(allAvailableTasks.length, 1);
+            const progEl = document.getElementById('home-progress-text');
+            if (progEl) {
+                progEl.innerHTML = `<span class="smooth-item" style="display:inline-block;">${completedTasks}/${totalAvail} Tasks</span>`;
+            }
+            const pct = Math.min(100, Math.round((completedTasks / totalAvail) * 100));
+            document.getElementById('home-progress-bar').style.width = `${Math.max(pct, 10)}%`;
+        }
+    }
+
+    function loadTasks(forceSkeleton = false) {
+        const refreshIcon = document.getElementById('tasks-refresh-icon');
+        if (refreshIcon) refreshIcon.classList.add('fa-spin');
+
+        if (forceSkeleton || allAvailableTasks.length === 0) {
+            if(!globalCategories.length) renderCategorySkeletons();
+            renderTaskSkeletons(4);
+        }
+        visibleTasksLimit = TASKS_PAGE_SIZE;
+
+        db.ref('tasks').once('value').then(snap => {
+            allAvailableTasks = [];
+            snap.forEach(child => {
+                const t = child.val();
+                if(t.status !== 'inactive') { allAvailableTasks.push({ id: child.key, ...t }); }
+            });
+            isTasksLoadedOnce = true;
+            localStorage.setItem('earnpro_tasks', JSON.stringify(allAvailableTasks));
+
+            if (refreshIcon) refreshIcon.classList.remove('fa-spin');
+            renderCategories();
+            renderTasks();
+            calculateProfileStats();
+        }).catch(() => {
+            if (refreshIcon) refreshIcon.classList.remove('fa-spin');
+        });
+    }
+
+    function renderCategories() {
+        const container = document.getElementById('category-filter');
+        let html = '';
+        
+        const isAllActive = currentCategory === 'All Tasks';
+        html += `
+            <div class="cat-tile ${isAllActive ? 'active' : ''} smooth-item" onclick="setCategory('All Tasks')">
+                <div class="cat-tile-icon" style="background: linear-gradient(135deg, #8B5CF6, #6D28D9);">
+                    <i class="fa-solid fa-gamepad" style="color:white;"></i>
+                </div>
+                <span>All Tasks</span>
+            </div>
+        `;
+
+        globalCategories.forEach((c, idx) => {
+            const isActive = currentCategory === c.name;
+            const imgHtml = c.img ? `<img src="${escapeHTML(c.img)}" style="width:100%; height:100%; border-radius:14px; object-fit:cover;">` : `<i class="fa-solid fa-layer-group" style="color:white;"></i>`;
+            const bgStyle = c.img ? 'background:transparent; box-shadow:none;' : 'background: linear-gradient(135deg, #38BDF8, #2563EB);';
+            
+            html += `
+                <div class="cat-tile ${isActive ? 'active' : ''} smooth-item" style="animation-delay: ${(idx+1) * 45}ms;" onclick="setCategory('${escapeHTML(c.name)}')">
+                    <div class="cat-tile-icon" style="${bgStyle}">
+                        ${imgHtml}
+                    </div>
+                    <span>${escapeHTML(c.name)}</span>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+
+    function setCategory(cat) {
+        currentCategory = cat;
+        visibleTasksLimit = TASKS_PAGE_SIZE;
+        renderCategories();
+        renderTaskSkeletons(3);
+        setTimeout(() => { renderTasks(); }, 140);
+    }
+    
+    function getTotalPossibleCoins(task) {
+        if(!task.stages || !Array.isArray(task.stages)) return Number(task.reward) || 0;
+        return task.stages.reduce((sum, s) => sum + (Number(s.reward) || 0), 0);
+    }
+
+    /* =========================================
+       NEW TASK RENDER (100% Matching Image)
+       ========================================= */
+    function renderTasks() {
+        const container = document.getElementById('main-tasks');
+        const filtered = currentCategory === 'All Tasks' ? allAvailableTasks : allAvailableTasks.filter(t => t.category === currentCategory);
+
+        if(filtered.length === 0) { 
+            container.innerHTML = `<div class="empty-state"><img src="gaming-controller.png" style="width:84px; opacity:0.85;" alt="No Tasks" onerror="this.src='https://cdn-icons-png.flaticon.com/512/808/808439.png'"><p style="margin-top:10px; font-weight:700;">No tasks available right now.</p></div>`; 
+            return; 
+        }
+
+        const paginatedTasks = filtered.slice(0, visibleTasksLimit);
+        let html = '';
+
+        paginatedTasks.forEach((task, idx) => {
+            const totalCoins = getTotalPossibleCoins(task);
+            const staggerDelay = Math.min(idx % TASKS_PAGE_SIZE, 6) * 55;
+            
+            // Clean estimated time fallback
+            const timeText = task.estTime ? escapeHTML(task.estTime) : '2 - 3 Min';
+
+            html += `
+                <div class="new-task-card smooth-item" style="animation-delay: ${staggerDelay}ms;" onclick="openTask('${escapeHTML(task.id)}')">
+                    <!-- Top Badge -->
+                    <div class="ntc-badge"><i class="fa-solid fa-star"></i> Top Offer</div>
+                    
+                    <!-- Middle Content -->
+                    <div class="ntc-content-row">
+                        <img class="ntc-app-icon lazy-img" loading="lazy" src="${escapeHTML(task.img || task.icon || 'gaming-controller.png')}" alt="Icon" onload="markImgLoaded(this)" onerror="this.src='https://cdn-icons-png.flaticon.com/512/808/808439.png'; markImgLoaded(this);">
+                        
+                        <div class="ntc-info">
+                            <div class="ntc-title">${escapeHTML(task.title)}</div>
+                            <div class="ntc-desc">${escapeHTML(task.desc || 'Install & Open the App')}</div>
+                        </div>
+                        
+                        <!-- Reward Glassy Box -->
+                        <div class="ntc-reward-box">
+                            <div class="ntc-reward-pill">Earn Upto</div>
+                            <div class="ntc-reward-amt">
+                                ${totalCoins.toLocaleString()}
+                            </div>
+                            <div class="ntc-floating-coin">
+                                <!-- using icon as placeholder until PNG is added -->
+                                <i class="fa-solid fa-coins"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bottom Action Bar -->
+                    <div class="ntc-bottom-row">
+                        <div class="ntc-meta-wrap">
+                            <div class="ntc-meta-item">
+                                <i class="fa-regular fa-clock ntc-meta-icon"></i>
+                                <div class="ntc-meta-texts">
+                                    <span class="ntc-meta-t1">${timeText}</span>
+                                    <span class="ntc-meta-t2">Time</span>
+                                </div>
+                            </div>
+                            
+                            <div class="ntc-meta-divider"></div>
+                            
+                            <div class="ntc-meta-item">
+                                <i class="fa-solid fa-trophy ntc-meta-icon"></i>
+                                <div class="ntc-meta-texts">
+                                    <span class="ntc-meta-t1">High Reward</span>
+                                    <span class="ntc-meta-t2">Best Offer</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="ntc-start-btn">Start Task <i class="fa-solid fa-chevron-right" style="font-size:11px;"></i></button>
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    /* =========================================
+       INTERSECTION OBSERVER FOR VIEWPORT PAGINATION
+       ========================================= */
+    let isPaginatingTasks = false;
+    function initViewportPagination() {
+        if (!('IntersectionObserver' in window)) return;
+
+        const taskSentinel = document.getElementById('tasks-sentinel');
+        const tasksInlineLoader = document.getElementById('tasks-inline-loader');
+        if (taskSentinel) {
+            const taskObs = new IntersectionObserver(entries => {
+                if (entries[0].isIntersecting && !isPaginatingTasks) {
+                    const filtered = currentCategory === 'All Tasks' ? allAvailableTasks : allAvailableTasks.filter(t => t.category === currentCategory);
+                    if (visibleTasksLimit < filtered.length) {
+                        isPaginatingTasks = true;
+                        if (tasksInlineLoader) tasksInlineLoader.classList.add('show');
+                        setTimeout(() => {
+                            visibleTasksLimit += TASKS_PAGE_SIZE;
+                            renderTasks();
+                            if (tasksInlineLoader) tasksInlineLoader.classList.remove('show');
+                            isPaginatingTasks = false;
+                        }, 260);
+                    }
+                }
+            }, { root: document.getElementById('home-screen'), rootMargin: '80px' });
+            taskObs.observe(taskSentinel);
+        }
+
+        const historySentinel = document.getElementById('history-sentinel');
+        if (historySentinel) {
+            const histObs = new IntersectionObserver(entries => {
+                if (entries[0].isIntersecting && historyLoaded && hasMoreHistoryInDb) {
+                    ensureHistoryLoaded(true);
+                }
+            }, { root: document.getElementById('wallet-screen'), rootMargin: '80px' });
+            histObs.observe(historySentinel);
+        }
+
+        const lbSentinel = document.getElementById('lb-sentinel');
+        if (lbSentinel) {
+            const lbObs = new IntersectionObserver(entries => {
+                if (entries[0].isIntersecting && leaderboardData.length > 0 && hasMoreLbInDb) {
+                    ensureLeaderboardLoaded(true);
+                }
+            }, { root: document.getElementById('leaderboard-screen'), rootMargin: '80px' });
+            lbObs.observe(lbSentinel);
+        }
+    }
+    window.addEventListener('DOMContentLoaded', initViewportPagination);
+
+    /* =========================================
+       TASK DETAIL & JOIN SYSTEM 
+       ========================================= */
+    function openTask(id) {
+        if (!currentUser) return; // Prevent glitches if not logged in
+        currentTaskOpen = allAvailableTasks.find(t => t.id === id);
+        if(!currentTaskOpen) return;
+        
+        showScreen('task-detail-screen');
+        renderTaskDetailSkeletons();
+        updateTaskDetailScreen();
+    }
+
+    function updateTaskDetailScreen() {
+        const task = currentTaskOpen;
+        if(!task) return;
+        
+        const userTask = userTasksStatus[task.id];
+        
+        const detailIcon = document.getElementById('detail-icon');
+        const detailWrap = document.getElementById('detail-icon-wrap');
+        detailIcon.classList.remove('is-loaded');
+        if (detailWrap) detailWrap.classList.remove('loaded-wrap');
+        detailIcon.src = escapeHTML(task.img || task.icon || 'gaming-controller.png');
+
+        document.getElementById('detail-title').innerHTML = `<span class="smooth-item" style="display:inline-block;">${escapeHTML(task.title)}</span>`;
+        document.getElementById('detail-cat-badge').innerText = escapeHTML(task.category || 'Offer');
+        animateNumber('detail-total-reward', getTotalPossibleCoins(task));
+        
+        let estHtml = '';
+        if (task.estTime) {
+            estHtml = `<span style="font-weight:800; color:#DC2626;"><i class="fa-regular fa-clock"></i> Estimated Time: ${escapeHTML(task.estTime)}</span> &bull; `;
+        }
+        document.getElementById('detail-desc').innerHTML = `<span class="smooth-item" style="display:inline-block;">${estHtml}${escapeHTML(task.desc || 'Complete the levels to earn rewards.')}</span>`;
+
+        const joinView = document.getElementById('task-join-view');
+        const progressView = document.getElementById('task-progress-view');
+
+        // Check if user has joined this task yet
+        if (!userTask || !userTask.status) {
+            joinView.style.display = 'block';
+            progressView.style.display = 'none';
+            document.getElementById('join-name').value = currentUser.name || '';
+            document.getElementById('join-mobile').value = currentUser.mobile || '';
+            setBtnLoading('join-task-btn', false, '', 'Register & Start Task');
+            return;
+        }
+
+        joinView.style.display = 'none';
+        progressView.style.display = 'block';
+
+        const refBox = document.getElementById('task-referral-box');
+        if (task.referralCode) {
+            refBox.style.display = 'flex';
+            document.getElementById('task-ref-code-display').innerText = escapeHTML(task.referralCode);
+        } else {
+            refBox.style.display = 'none';
+        }
+
+        const rulesList = document.getElementById('task-rules-list');
+        rulesList.innerHTML = '';
+        if (task.rules && Array.isArray(task.rules) && task.rules.length > 0) {
+            task.rules.forEach((rule, rIdx) => {
+                rulesList.innerHTML += `<li class="smooth-item" style="animation-delay:${rIdx * 40}ms;"><i class="fa-solid fa-chevron-right"></i> ${escapeHTML(rule)}</li>`;
+            });
+        } else {
+            rulesList.innerHTML = `<li class="smooth-item"><i class="fa-solid fa-chevron-right"></i> Follow the task steps carefully and submit your progress.</li>`;
+        }
+
+        const timeline = document.getElementById('task-timeline');
+        const bottomCta = document.getElementById('detail-bottom-cta');
+        const completeBanner = document.getElementById('task-complete-banner');
+        timeline.innerHTML = '';
+        bottomCta.innerHTML = '';
+        completeBanner.style.display = 'none';
+        
+        let stages = task.stages || [{ title: 'Complete Offer', desc: 'Click to proceed.', reward: task.reward, link: task.link }];
+        document.getElementById('stages-count-heading').innerText = `Stages (${stages.length})`;
+
+        const currentStageIndex = userTask.currentStage || 0;
+        const stageStatus = userTask.stageStatus || userTask.status || 'joined'; 
+        
+        const isTaskFullyComplete = (currentStageIndex >= stages.length) || 
+                                    ((stageStatus === 'completed' || stageStatus === 'approved') && currentStageIndex === stages.length - 1);
+
+        if(isTaskFullyComplete) {
+            completeBanner.style.display = 'block';
+            bottomCta.innerHTML = `<button class="btn-royal smooth-item" onclick="showScreen('home-screen')">Explore More Tasks</button>`;
+        }
+
+        let timelineHtml = '';
+        stages.forEach((stage, index) => {
+            let iconBadge = '';
+            let rightLabel = `+${stage.reward} Coins`;
+            let stageStateLabel = 'Locked';
+
+            if (index < currentStageIndex || (index === 0 && (stageStatus === 'completed' || stageStatus === 'approved') && stages.length===1) || (isTaskFullyComplete && index <= currentStageIndex)) {
+                iconBadge = `<div class="stage-status-icon done"><i class="fa-solid fa-check"></i></div>`;
+                stageStateLabel = 'Completed';
+            } else if (index === currentStageIndex && !isTaskFullyComplete) {
+                if (stageStatus === 'pending') {
+                    iconBadge = `<div class="stage-status-icon pending"><i class="fa-solid fa-clock"></i></div>`;
+                    stageStateLabel = 'Waiting for Verification';
+                    bottomCta.innerHTML = `<button class="btn-royal smooth-item" disabled><i class="fa-solid fa-clock"></i> Stage ${index + 1} Pending</button>`;
+                } else if (stageStatus === 'rejected') {
+                    iconBadge = `<div class="stage-status-icon active"><i class="fa-solid fa-rotate-right"></i></div>`;
+                    stageStateLabel = 'Rejected - Retry';
+                    bottomCta.innerHTML = `<button class="btn-royal smooth-item" id="stage-action-btn" onclick="startTaskStage('${escapeHTML(task.id)}', ${index}, '${escapeHTML(stage.link)}')">Retry Stage ${index + 1}</button>`;
+                } else {
+                    iconBadge = `<div class="stage-status-icon active"><i class="fa-solid fa-arrow-down"></i></div>`;
+                    stageStateLabel = 'In Progress';
+                    bottomCta.innerHTML = `<button class="btn-royal smooth-item" id="stage-action-btn" onclick="startTaskStage('${escapeHTML(task.id)}', ${index}, '${escapeHTML(stage.link)}')">Start Stage ${index + 1}</button>`;
+                }
+            } else {
+                iconBadge = `<div class="stage-status-icon locked"><i class="fa-solid fa-lock"></i></div>`;
+            }
+
+            timelineHtml += `
+                <div class="stage-card-row smooth-item" style="animation-delay: ${index * 55}ms;">
+                    ${iconBadge}
+                    <div class="stage-mid-info">
+                        <div class="st-title">Stage ${index + 1} &bull; ${stageStateLabel}</div>
+                        <div class="st-sub">${escapeHTML(stage.desc || stage.title)}</div>
+                    </div>
+                    <div class="stage-right-coins">${escapeHTML(rightLabel)}</div>
+                </div>
+            `;
+        });
+        timeline.innerHTML = timelineHtml;
+    }
+
+    function submitTaskJoin() {
+        if(!currentTaskOpen) return;
+        const name = document.getElementById('join-name').value.trim();
+        const mobile = document.getElementById('join-mobile').value.trim();
+        if(!name) return showAlert('Required', 'Please enter your name.', 'error');
+        if(!mobile || mobile.length !== 10 || isNaN(mobile)) return showAlert('Required', 'Valid 10-digit mobile required.', 'error');
+
+        setBtnLoading('join-task-btn', true, 'Joining Task...', 'Register & Start Task');
+        const taskData = {
+            status: 'joined',
+            stageStatus: 'joined',
+            currentStage: 0,
+            joinName: name,
+            joinMobile: mobile,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        db.ref(`users/${currentUser.uid}/tasks/${currentTaskOpen.id}`).set(taskData).then(() => {
+            setBtnLoading('join-task-btn', false, '', 'Register & Start Task');
+        }).catch(err => {
+            setBtnLoading('join-task-btn', false, '', 'Register & Start Task');
+            showAlert('Error', 'Could not register for task.', 'error');
+        });
+    }
+
+    /* =========================================
+       TASK REDIRECT SYSTEM WITH FAILURE HANDLING
+       ========================================= */
+    function startTaskStage(taskId, stageIndex, linkUrl) {
+        const loader = document.getElementById('task-redirect-loader');
+        if(loader.style.display === 'flex') return;
+
+        pendingTaskParams = { taskId, stageIndex, linkUrl };
+        
+        const spinner = document.getElementById('redirect-spinner');
+        const text = document.getElementById('redirect-text');
+        const retryBtn = document.getElementById('redirect-retry-btn');
+        const cancelBtn = document.getElementById('redirect-cancel-btn');
+
+        // NEW LOADER TEXT
+        loader.style.display = 'flex';
+        spinner.style.display = 'block';
+        retryBtn.style.display = 'none';
+        cancelBtn.style.display = 'none';
+        text.innerHTML = 'Redirecting to Task...<br><span style="font-size:13px; font-weight:500; margin-top:8px; display:block; opacity:0.9;">Please wait while we verify and redirect you.</span>';
+
+        let popupWindow = null;
+        let navFailed = false;
+
+        if (linkUrl && linkUrl !== '#' && linkUrl !== 'undefined') {
+            try {
+                popupWindow = window.open(linkUrl, '_blank');
+                if (!popupWindow || popupWindow.closed || typeof popupWindow.closed === 'undefined') {
+                    navFailed = true;
+                }
+            } catch (e) {
+                navFailed = true;
+            }
+        }
+
+        const task = allAvailableTasks.find(t => t.id === taskId);
+        const stage = task.stages ? task.stages[stageIndex] : null;
+        const reward = stage ? stage.reward : task.reward;
+
+        const newReqRef = db.ref('pendingRequests').push();
+        const requestData = { 
+            uid: currentUser.uid, 
+            name: currentUser.name, 
+            email: currentUser.email, 
+            taskId: taskId, 
+            taskName: task.title, 
+            stageIndex: stageIndex, 
+            expectedReward: reward, 
+            timestamp: firebase.database.ServerValue.TIMESTAMP, 
+            status: 'pending' 
+        };
+
+        const updates = {};
+        updates[`pendingRequests/${newReqRef.key}`] = requestData;
+        updates[`users/${currentUser.uid}/tasks/${taskId}/status`] = 'pending';
+        updates[`users/${currentUser.uid}/tasks/${taskId}/stageStatus`] = 'pending';
+        updates[`users/${currentUser.uid}/tasks/${taskId}/currentStage`] = stageIndex;
+        updates[`users/${currentUser.uid}/tasks/${taskId}/reqId`] = newReqRef.key;
+        updates[`users/${currentUser.uid}/tasks/${taskId}/timestamp`] = firebase.database.ServerValue.TIMESTAMP;
+
+        db.ref().update(updates).then(() => {
+            if (navFailed && linkUrl && linkUrl !== '#' && linkUrl !== 'undefined') {
+                showRedirectError();
+            } else {
+                setTimeout(() => {
+                    closeRedirectLoader();
+                    showAlert('Submitted', 'Stage submission sent for verification.', 'success');
+                }, 1000); // 1 sec delay to show the nice text
+            }
+        }).catch(err => {
+            showRedirectError();
+        });
+    }
+
+    function showRedirectError() {
+        const spinner = document.getElementById('redirect-spinner');
+        const text = document.getElementById('redirect-text');
+        const retryBtn = document.getElementById('redirect-retry-btn');
+        const cancelBtn = document.getElementById('redirect-cancel-btn');
+
+        spinner.style.display = 'none';
+        text.innerText = 'Unable to open task. Please try again.';
+        retryBtn.style.display = 'inline-block';
+        cancelBtn.style.display = 'inline-block';
+    }
+
+    function retryLastTask() {
+        if(pendingTaskParams) {
+            closeRedirectLoader();
+            startTaskStage(pendingTaskParams.taskId, pendingTaskParams.stageIndex, pendingTaskParams.linkUrl);
+        }
+    }
+
+    function closeRedirectLoader() {
+        document.getElementById('task-redirect-loader').style.display = 'none';
+    }
+
+    function copyTaskReferral() {
+        if(!currentTaskOpen || !currentTaskOpen.referralCode) return;
+        navigator.clipboard.writeText(currentTaskOpen.referralCode).then(() => {
+            showAlert('Copied', `Referral Code ${currentTaskOpen.referralCode} copied to clipboard!`, 'success');
+        }).catch(err => {
+            showAlert('Error', 'Failed to copy code.', 'error');
+        });
+    }
+
+    /* =========================================
+       WALLET & WITHDRAWALS (Limit Enforced >= 30)
+       ========================================= */
+    function selectWithdraw(method) {
+        withdrawMethod = method;
+        document.querySelectorAll('.wd-tab').forEach(el => el.classList.remove('selected'));
+        document.getElementById(`wd-${method}`).classList.add('selected');
+        const label = document.getElementById('withdraw-label');
+        const input = document.getElementById('withdraw-input');
+        if (method === 'upi') { label.innerText = 'UPI ID'; input.placeholder = 'user@okaxis'; } 
+        else { label.innerText = 'WhatsApp Number'; input.placeholder = '10 digit number'; }
+    }
+
+    function requestWithdraw() {
+        const detail = document.getElementById('withdraw-input').value.trim();
+        const customAmtStr = document.getElementById('withdraw-custom-amount').value;
+        const selectedWithdrawAmount = parseInt(customAmtStr, 10);
+        
+        if (!detail) return showAlert('Required', 'Please enter withdrawal details.', 'error');
+        
+        // Strict Validation Check (>= 30 Limit check)
+        if (isNaN(selectedWithdrawAmount) || selectedWithdrawAmount < 30) {
+            return showAlert('Error', 'Minimum withdrawal is 30 Coins.', 'error');
+        }
+
+        setBtnLoading('submit-wd-btn', true, 'Submitting Request...', 'Submit Request');
+
+        const walletRef = db.ref(`users/${currentUser.uid}/wallet/balance`);
+        walletRef.transaction(current => {
+            if ((current || 0) >= selectedWithdrawAmount) return current - selectedWithdrawAmount;
+            return; 
+        }, (error, committed) => {
+            if (error) { setBtnLoading('submit-wd-btn', false, '', 'Submit Request'); return showAlert('Error', 'Could not verify balance.', 'error'); }
+            if (!committed) { setBtnLoading('submit-wd-btn', false, '', 'Submit Request'); return showAlert('Low Balance', 'You do not have enough coins.', 'error'); }
+            
+            const withdrawReq = { 
+                uid: currentUser.uid, 
+                name: currentUser.name, 
+                mobile: currentUser.mobile, 
+                method: withdrawMethod, 
+                details: detail, 
+                amount: selectedWithdrawAmount, 
+                timestamp: firebase.database.ServerValue.TIMESTAMP, 
+                status: 'pending' 
+            };
+            const historyLog = { 
+                title: withdrawMethod === 'upi' ? 'UPI Withdrawal' : 'Playstore Code', 
+                amount: selectedWithdrawAmount, 
+                type: 'withdraw', 
+                timestamp: firebase.database.ServerValue.TIMESTAMP, 
+                status: 'pending' 
+            };
+            
+            const updates = {};
+            updates[`withdrawRequests/${db.ref('withdrawRequests').push().key}`] = withdrawReq;
+            updates[`users/${currentUser.uid}/history/${db.ref().push().key}`] = historyLog;
+            
+            db.ref().update(updates).then(() => {
+                setBtnLoading('submit-wd-btn', false, '', 'Submit Request');
+                document.getElementById('withdraw-input').value = '';
+                document.getElementById('withdraw-custom-amount').value = '';
+                showAlert('Request Sent', `Withdrawal of ${selectedWithdrawAmount} Coins submitted successfully.`, 'success');
+            }).catch(() => { setBtnLoading('submit-wd-btn', false, '', 'Submit Request'); showAlert('Error', 'Submission failed.', 'error'); });
+        });
+    }
+
+    function renderHistory() {
+        const container = document.getElementById('history-list');
+        if(userHistoryData.length === 0) {
+            container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-receipt" style="font-size:30px; margin-bottom:10px; color:#CBD5E1;"></i><p>No transactions yet.</p></div>`;
+            return;
+        }
+        const paginatedHistory = userHistoryData.slice(0, visibleHistoryLimit);
+        let html = '';
+        paginatedHistory.forEach((item, idx) => {
+            const isWithdraw = item.type === 'withdraw';
+            const dateStr = item.timestamp ? new Date(item.timestamp).toLocaleDateString(undefined, {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Recent';
+            let iconHtml = isWithdraw ? `<div class="history-icon withdraw"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>` : `<div class="history-icon reward"><i class="fa-solid fa-coins"></i></div>`;
+            const staggerDelay = Math.min(idx % HISTORY_PAGE_SIZE, 7) * 45;
+            html += `
+                <div class="history-item smooth-item" style="animation-delay: ${staggerDelay}ms;">
+                    ${iconHtml}
+                    <div class="history-info">
+                        <div class="title">${escapeHTML(item.title || item.taskName || 'Reward')}</div>
+                        <div class="date">${escapeHTML(dateStr)}</div>
+                    </div>
+                    <div class="history-amount ${!isWithdraw ? 'positive' : 'negative'}">
+                        ${isWithdraw ? '-' : '+'}${Number(item.amount).toLocaleString()}
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function switchLbTab(el) {
+        document.querySelectorAll('.lb-pill').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        renderLeaderboardSkeletons();
+        setTimeout(() => {
+            renderLeaderboard();
+        }, 160);
+    }
+
+    function renderLeaderboard() {
+        const podium = document.getElementById('lb-podium');
+        const list = document.getElementById('lb-list');
+        podium.innerHTML = ''; list.innerHTML = '';
+        
+        if (leaderboardData.length === 0) { 
+            list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-trophy" style="font-size:36px; color:#CBD5E1; margin-bottom:12px;"></i><p style="font-weight:700;">No users on the leaderboard yet.<br>Be the first!</p></div>`; 
+            return; 
+        }
+
+        const top3 = leaderboardData.slice(0, 3);
+        const orderedTop = [top3[1], top3[0], top3[2]].filter(Boolean);
+        
+        let podiumHtml = '';
+        orderedTop.forEach((user, pIdx) => {
+            const rank = leaderboardData.indexOf(user) + 1;
+            const crownHtml = rank === 1 ? `<div class="podium-crown"><i class="fa-solid fa-trophy"></i></div>` : '';
+            podiumHtml += `
+                <div class="podium-col rank-${rank} smooth-item" style="animation-delay: ${pIdx * 70}ms;">
+                    ${crownHtml}
+                    <div class="podium-ava-wrap">
+                        <div class="podium-ava">${escapeHTML(user.name ? user.name.charAt(0).toUpperCase() : 'U')}</div>
+                    </div>
+                    <div class="podium-pedestal">
+                        <div class="rank-badge-num">${rank}</div>
+                        <div class="podium-name">${escapeHTML(user.name ? user.name.split(' ')[0] : 'User')}</div>
+                        <div class="podium-score">${Number(user.lifetimeEarnings || 0).toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+        });
+        podium.innerHTML = podiumHtml;
+
+        let listHtml = '';
+        leaderboardData.slice(3, visibleLbLimit).forEach((user, idx) => {
+            const staggerDelay = Math.min(idx % LB_PAGE_SIZE, 8) * 45;
+            listHtml += `
+                <div class="lb-row smooth-item" style="animation-delay: ${staggerDelay}ms;">
+                    <div class="lb-rank">${idx + 4}</div>
+                    <div class="lb-info">${escapeHTML(user.name || 'Hidden User')}</div>
+                    <div class="lb-reward">${Number(user.lifetimeEarnings || 0).toLocaleString()} <i class="fa-solid fa-coins" style="font-size:11px; color:#F59E0B;"></i></div>
+                </div>
+            `;
+        });
+        list.innerHTML = listHtml;
+
+        if (currentUser) {
+            const myRank = leaderboardData.findIndex(u => u.uid === currentUser.uid);
+            document.getElementById('stat-rank').innerHTML = `<span class="smooth-item">${myRank !== -1 ? `${myRank + 1}` : '-'}</span>`;
+            if (!historyLoaded) {
+                const meInLb = leaderboardData.find(u => u.uid === currentUser.uid);
+                animateNumber('lb-you-score', meInLb ? (meInLb.lifetimeEarnings || 0) : userBalance);
+            }
+        }
+    }
+
+    function openSupport() {
+        if (appSettings.supportWhatsApp) { window.open(`https://wa.me/${appSettings.supportWhatsApp}?text=Hello, I need help with EarnPro.`, '_blank'); } 
+        else { showAlert('Support', 'Support line is currently unavailable.', 'info'); }
+    }
+
+    function viewLegal(type) {
+        let content = type === 'Privacy Policy' ? appSettings.privacyPolicy : appSettings.termsConditions;
+        showAlert(type, content, 'info');
+    }
+</script>
 </body>
 </html>
