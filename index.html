@@ -2075,6 +2075,82 @@
     /* =========================================
        TASK DETAIL & JOIN SYSTEM 
        ========================================= */
+       
+    function formatStageInstructionsUI(rawText) {
+        if (!rawText || String(rawText).trim() === '') return '';
+        const text = String(rawText).trim();
+        
+        // Find all indices of numbered lists: e.g., "1. ", " 2. ", "\n3. "
+        const stepMatches = [...text.matchAll(/(?:^|\n|\s)(\d+)\.\s+/g)];
+        
+        if (stepMatches.length === 0) {
+            return `
+                <div style="padding: 0 16px 16px;">
+                    <div style="background:#F8FAFC; padding:16px; border-radius:12px; border-left:4px solid var(--royal-blue);">
+                        <div style="font-size:12px; font-weight:800; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase; margin-bottom:4px;">STAGE INSTRUCTIONS</div>
+                        <div style="font-size:14.5px; font-weight:600; color:var(--text-dark); line-height:1.5; white-space:pre-wrap; word-break:break-word;">${escapeHTML(text)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        let parsedSteps = [];
+        for (let i = 0; i < stepMatches.length; i++) {
+            let start = stepMatches[i].index + stepMatches[i][0].length;
+            let end = (i + 1 < stepMatches.length) ? stepMatches[i+1].index : text.length;
+            parsedSteps.push(text.substring(start, end).trim());
+        }
+
+        let lastStepRaw = parsedSteps[parsedSteps.length - 1];
+        let notePart = "";
+        
+        let splitIndex = lastStepRaw.indexOf('\n');
+        if (splitIndex !== -1) {
+            let doubleNewline = lastStepRaw.indexOf('\n\n');
+            if (doubleNewline !== -1) {
+                notePart = lastStepRaw.substring(doubleNewline).trim();
+                parsedSteps[parsedSteps.length - 1] = lastStepRaw.substring(0, doubleNewline).trim();
+            } else {
+                notePart = lastStepRaw.substring(splitIndex).trim();
+                parsedSteps[parsedSteps.length - 1] = lastStepRaw.substring(0, splitIndex).trim();
+            }
+        }
+
+        let html = '<div style="padding: 0 16px 16px; display:flex; flex-direction:column; gap:16px;">';
+        html += '<div style="height:1px; background:#F1F5F9; margin: 0 -16px 4px;"></div>';
+
+        parsedSteps.forEach((stepText, idx) => {
+            let stepNum = (idx + 1).toString().padStart(2, '0');
+            let isLast = idx === parsedSteps.length - 1 && !notePart;
+            let borderBottom = isLast ? '' : 'border-bottom:1px solid #F1F5F9; padding-bottom:16px;';
+            
+            html += `
+                <div style="display:flex; flex-direction:column; gap:6px; ${borderBottom}">
+                    <div style="font-size:12px; font-weight:800; color:var(--royal-blue); letter-spacing:0.5px;">STEP ${stepNum}</div>
+                    <div style="font-size:15.5px; font-weight:700; color:var(--text-dark); line-height:1.55; word-break:break-word; white-space:pre-wrap;">${escapeHTML(stepText)}</div>
+                </div>
+            `;
+        });
+
+        if (notePart) {
+            let noteHeading = "IMPORTANT NOTE";
+            let lowerNote = notePart.toLowerCase();
+            if (lowerNote.includes('reward') || lowerNote.includes('payment') || lowerNote.includes('cashback') || lowerNote.includes('wallet')) {
+                noteHeading = "REWARD INFORMATION";
+            }
+            
+            html += `
+                <div style="display:flex; flex-direction:column; gap:6px; background:#F8FAFC; padding:16px; border-radius:12px; border-left:4px solid var(--royal-blue); margin-top:4px;">
+                    <div style="font-size:12px; font-weight:800; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">${noteHeading}</div>
+                    <div style="font-size:14.5px; font-weight:600; color:var(--text-dark); line-height:1.55; word-break:break-word; white-space:pre-wrap;">${escapeHTML(notePart)}</div>
+                </div>
+            `;
+        }
+
+        html += '</div>';
+        return html;
+    }
+
     function openTask(id) {
         if (!currentUser) return; 
         currentTaskOpen = allAvailableTasks.find(t => t.id === id);
@@ -2138,6 +2214,10 @@
         const refBox = document.getElementById('task-referral-box');
         if (task.referralCode) {
             refBox.style.display = 'flex';
+            const refLabelEl = refBox.querySelector('div:first-child');
+            if (refLabelEl) {
+                refLabelEl.innerText = task.referralInstructions ? task.referralInstructions : 'Referral Code Required';
+            }
             document.getElementById('task-ref-code-display').innerText = escapeHTML(task.referralCode);
         } else {
             refBox.style.display = 'none';
@@ -2176,6 +2256,7 @@
 
         let timelineHtml = '';
         stages.forEach((stage, index) => {
+            const targetStageLink = (stage.link && String(stage.link).trim() !== '') ? String(stage.link).trim() : (task.link || '');
             let iconBadge = '';
             let stageCalcReward = Math.round((Number(stage.reward) || 0) * multiplier);
             let rightLabel = `+ <i class="fa-solid fa-indian-rupee-sign"></i> ${stageCalcReward}`;
@@ -2192,24 +2273,36 @@
                 } else if (stageStatus === 'rejected') {
                     iconBadge = `<div class="stage-status-icon active"><i class="fa-solid fa-rotate-right"></i></div>`;
                     stageStateLabel = 'Rejected - Retry';
-                    bottomCta.innerHTML = `<button class="btn-royal smooth-item" id="stage-action-btn" onclick="startTaskStage('${escapeHTML(task.id)}', ${index}, '${escapeHTML(stage.link)}')">Retry Stage ${index + 1}</button>`;
+                    bottomCta.innerHTML = `<button class="btn-royal smooth-item" id="stage-action-btn" onclick="startTaskStage('${escapeHTML(task.id)}', ${index}, '${escapeHTML(targetStageLink)}')">Retry Stage ${index + 1}</button>`;
                 } else {
                     iconBadge = `<div class="stage-status-icon active"><i class="fa-solid fa-arrow-down"></i></div>`;
                     stageStateLabel = 'In Progress';
-                    bottomCta.innerHTML = `<button class="btn-royal smooth-item" id="stage-action-btn" onclick="startTaskStage('${escapeHTML(task.id)}', ${index}, '${escapeHTML(stage.link)}')">Start Stage ${index + 1}</button>`;
+                    bottomCta.innerHTML = `<button class="btn-royal smooth-item" id="stage-action-btn" onclick="startTaskStage('${escapeHTML(task.id)}', ${index}, '${escapeHTML(targetStageLink)}')">Start Stage ${index + 1}</button>`;
                 }
             } else {
                 iconBadge = `<div class="stage-status-icon locked"><i class="fa-solid fa-lock"></i></div>`;
             }
 
+            const stageRulesHtml = (stage.rules && String(stage.rules).trim() !== '') 
+                ? formatStageInstructionsUI(stage.rules)
+                : '';
+            
+            const rejectReasonHtml = (index === currentStageIndex && stageStatus === 'rejected' && userTask && userTask.reason)
+                ? `<div style="margin-top:8px; font-size:12px; font-weight:700; color:var(--danger); background:var(--danger-soft); padding:8px 12px; border-radius:8px; display:inline-block; line-height:1.4;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:4px;"></i> Note: ${escapeHTML(userTask.reason)}</div>`
+                : '';
+
             timelineHtml += `
-                <div class="stage-card-row smooth-item" style="animation-delay: ${index * 55}ms;">
-                    ${iconBadge}
-                    <div class="stage-mid-info">
-                        <div class="st-title">Stage ${index + 1} &bull; ${stageStateLabel}</div>
-                        <div class="st-sub">${escapeHTML(stage.desc || stage.title)}</div>
+                <div class="stage-card-row smooth-item" style="animation-delay: ${index * 55}ms; flex-direction: column; align-items: stretch; padding: 0; gap: 0;">
+                    <div style="display: flex; align-items: flex-start; gap: 14px; padding: 16px;">
+                        ${iconBadge}
+                        <div class="stage-mid-info" style="flex: 1; min-width: 0;">
+                            <div class="st-title">Stage ${index + 1}${stage.title ? ': ' + escapeHTML(stage.title) : ''} &bull; ${stageStateLabel}</div>
+                            <div class="st-sub">${escapeHTML(stage.desc || stage.title || 'Follow the steps to complete this stage.')}</div>
+                            ${rejectReasonHtml}
+                        </div>
+                        <div class="stage-right-coins" style="white-space: nowrap; margin-top: 2px;">${rightLabel}</div>
                     </div>
-                    <div class="stage-right-coins">${rightLabel}</div>
+                    ${stageRulesHtml}
                 </div>
             `;
         });
