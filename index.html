@@ -1063,52 +1063,34 @@
         <button class="redirect-retry-btn" id="redirect-retry-btn" onclick="retryLastTask()">Retry</button>
         <button class="redirect-cancel-btn" id="redirect-cancel-btn" onclick="closeRedirectLoader()">Cancel</button>
     </div>
-
-</div>
-<div id="app-version"
-style="position:fixed;bottom:8px;right:12px;
-font-size:11px;color:#888;z-index:9999">
-Checking version...
+    
+<div id="appVersion" style="font-size:12px;color:#888">
+  Detecting app version...
 </div>
 
 <script>
-(async function () {
-  let version = "Not detected";
+(function () {
+  const el = document.getElementById("appVersion");
 
   try {
-    // Possible native AppCreator24 interfaces
-    const bridges = [
-      window.AppCreator24,
-      window.Android,
-      window.AndroidBridge,
-      window.AppInterface
-    ];
+    if (
+      window.Android &&
+      typeof window.Android.getVersionName === "function"
+    ) {
+      const version = window.Android.getVersionName();
 
-    for (const bridge of bridges) {
-      if (!bridge) continue;
+      localStorage.setItem("apk_version", version);
+      el.textContent = "Version " + version;
 
-      if (typeof bridge.getVersionName === "function") {
-        version = bridge.getVersionName();
-        break;
-      }
-    }
-
-    // Save locally on this device only
-    if (version !== "Not detected") {
-      localStorage.setItem("installed_apk_version", version);
     } else {
-      version = localStorage.getItem("installed_apk_version") || version;
+      el.textContent = "Native version API unavailable";
     }
-
-    document.getElementById("app-version").textContent =
-      "App Version: " + version;
-
   } catch (error) {
-    document.getElementById("app-version").textContent =
-      "App Version: Not detected";
+    el.textContent = "Version detection failed";
   }
 })();
 </script>
+    
 <script>
     /* =========================================
        FIREBASE CONFIGURATION
