@@ -279,7 +279,7 @@
             box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4);
         }
         .ntc-reward-amt {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 900;
             color: #451A03;
             margin-top: 6px;
@@ -691,7 +691,7 @@
     <!-- TASK DETAIL SCREEN -->
     <div id="task-detail-screen" class="screen no-nav">
         <div class="top-light-nav">
-            <div class="circle-icon-btn" onclick="showScreen('home-screen')"><i class="fa-solid fa-arrow-left"></i></div>
+            <div class="circle-icon-btn" onclick="showScreen('home-screen'); renderTasks();"><i class="fa-solid fa-arrow-left"></i></div>
             <div style="font-weight:800; font-size:16px;" id="task-detail-header-title">Task Details</div>
             <div style="width:38px;"></div>
         </div>
@@ -705,11 +705,16 @@
             <p id="detail-desc"><span class="val-skeleton sk-shimmer" style="width:220px; height:14px;"></span></p>
         </div>
 
+        <div class="gold-reward-banner" id="dynamic-bonus-banner" style="display:none; flex-direction:column; background: linear-gradient(135deg, #FEF2F2, #FEE2E2); border-color: #FCA5A5; margin-bottom:14px; text-align:center; padding:12px;">
+            <div style="color: #DC2626; font-weight:900; font-size:14px;"><i class="fa-solid fa-fire" style="color: #EF4444; margin-right: 4px;"></i> 20% BONUS APPLIED <i class="fa-solid fa-fire" style="color: #EF4444; margin-left: 4px;"></i></div>
+            <div style="color: #991B1B; font-size:12px; font-weight:700; margin-top:2px;">Complete now to claim your boosted reward!</div>
+        </div>
+
         <div class="gold-reward-banner">
-            <div class="gold-coin-circle"><i class="fa-solid fa-coins"></i></div>
+            <div class="gold-coin-circle"><i class="fa-solid fa-indian-rupee-sign"></i></div>
             <div class="gold-reward-text">
                 <span>Total Reward</span>
-                <strong><span id="detail-total-reward"><span class="val-skeleton sk-shimmer-gold" style="width:65px; height:20px;"></span></span> Coins</strong>
+                <strong><i class="fa-solid fa-indian-rupee-sign" style="font-size:15px; margin-right:4px;"></i><span id="detail-total-reward"><span class="val-skeleton sk-shimmer-gold" style="width:65px; height:20px;"></span></span></strong>
             </div>
         </div>
 
@@ -767,7 +772,7 @@
     <!-- MY WALLET SCREEN -->
     <div id="wallet-screen" class="screen">
         <div class="top-light-nav">
-            <div class="circle-icon-btn" onclick="showScreen('home-screen'); setActiveNav('nav-home');"><i class="fa-solid fa-arrow-left"></i></div>
+            <div class="circle-icon-btn" onclick="showScreen('home-screen'); setActiveNav('nav-home'); renderTasks();"><i class="fa-solid fa-arrow-left"></i></div>
             <div style="font-size:18px; font-weight:800;">My Wallet</div>
             <div class="circle-icon-btn" onclick="showScreen('withdraw-screen')" title="Withdraw"><i class="fa-solid fa-bolt" style="color:var(--royal-blue);"></i></div>
         </div>
@@ -851,7 +856,7 @@
     <!-- LEADERBOARD SCREEN -->
     <div id="leaderboard-screen" class="screen">
         <div class="dark-top-header">
-            <div class="back-arrow" onclick="showScreen('home-screen'); setActiveNav('nav-home');"><i class="fa-solid fa-chevron-left"></i></div>
+            <div class="back-arrow" onclick="showScreen('home-screen'); setActiveNav('nav-home'); renderTasks();"><i class="fa-solid fa-chevron-left"></i></div>
             <div class="title">Leaderboard</div>
             <div style="width:36px;"></div>
         </div>
@@ -917,7 +922,7 @@
                     <div class="left"><i class="fa-solid fa-wallet"></i> <span>My Earnings</span></div>
                     <i class="fa-solid fa-chevron-right"></i>
                 </div>
-                <div class="menu-item" onclick="showScreen('home-screen'); setActiveNav('nav-tasks');">
+                <div class="menu-item" onclick="showScreen('home-screen'); setActiveNav('nav-tasks'); renderTasks(); document.getElementById('main-tasks').scrollIntoView({behavior:'smooth'});">
                     <div class="left"><i class="fa-solid fa-clipboard-check"></i> <span>Task Activity</span></div>
                     <i class="fa-solid fa-chevron-right"></i>
                 </div>
@@ -1029,16 +1034,16 @@
 
     <!-- BOTTOM NAVBAR -->
     <div id="navbar" style="display: none;">
-        <div class="nav-item active" id="nav-home" onclick="showScreen('home-screen'); setActiveNav('nav-home')">
+        <div class="nav-item active" id="nav-home" onclick="showScreen('home-screen'); setActiveNav('nav-home'); renderTasks();">
             <i class="fa-solid fa-house"></i><span>Home</span>
         </div>
-        <div class="nav-item" id="nav-tasks" onclick="showScreen('home-screen'); setActiveNav('nav-tasks'); document.getElementById('main-tasks').scrollIntoView({behavior:'smooth'});">
+        <div class="nav-item" id="nav-tasks" onclick="showScreen('home-screen'); setActiveNav('nav-tasks'); renderTasks(); document.getElementById('main-tasks').scrollIntoView({behavior:'smooth'});">
             <i class="fa-solid fa-clipboard-check"></i><span>Tasks</span>
         </div>
-        <div class="nav-item" id="nav-leaderboard" onclick="showScreen('leaderboard-screen'); setActiveNav('nav-leaderboard')">
+        <div class="nav-item" id="nav-leaderboard" onclick="showScreen('leaderboard-screen'); setActiveNav('nav-leaderboard');">
             <i class="fa-solid fa-trophy"></i><span>Leaderboard</span>
         </div>
-        <div class="nav-item" id="nav-profile" onclick="showScreen('profile-screen'); setActiveNav('nav-profile')">
+        <div class="nav-item" id="nav-profile" onclick="showScreen('profile-screen'); setActiveNav('nav-profile');">
             <i class="fa-regular fa-user"></i><span>Profile</span>
         </div>
     </div>
@@ -1066,32 +1071,6 @@
 
 </div>
 
-<div id="appVersion" style="font-size:12px;color:#888">
-  Detecting app version...
-</div>
-
-<script>
-(function () {
-  const el = document.getElementById("appVersion");
-
-  try {
-    if (
-      window.Android &&
-      typeof window.Android.getVersionName === "function"
-    ) {
-      const version = window.Android.getVersionName();
-
-      localStorage.setItem("apk_version", version);
-      el.textContent = "Version " + version;
-
-    } else {
-      el.textContent = "Native version API unavailable";
-    }
-  } catch (error) {
-    el.textContent = "Version detection failed";
-  }
-})();
-</script>
 <script>
     /* =========================================
        FIREBASE CONFIGURATION
@@ -1140,6 +1119,8 @@
     let lbFetchLimit = LB_PAGE_SIZE;
     let hasMoreLbInDb = true;
     let isFetchingMoreLb = false;
+    
+    let lastSyncedLifetimeEarnings = null;
 
     let activeDbListeners = [];
 
@@ -1435,6 +1416,7 @@
         isTasksLoadedOnce = false;
         isUserTasksLoadedOnce = false;
         lbLastFetchedAt = 0;
+        lastSyncedLifetimeEarnings = null;
     }
 
     function resetAuthUI() {
@@ -1629,11 +1611,14 @@
                 userHistoryData.forEach(h => { if (h.type !== 'withdraw' && (h.amount > 0)) tempEarned += Number(h.amount); });
                 currentScore = tempEarned;
             }
-            db.ref(`publicLeaderboard/${currentUser.uid}`).update({
-                name: currentUser.name,
-                lifetimeEarnings: currentScore,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            }).catch(e=>{});
+            if (lastSyncedLifetimeEarnings !== currentScore) {
+                lastSyncedLifetimeEarnings = currentScore;
+                db.ref(`publicLeaderboard/${currentUser.uid}`).update({
+                    name: currentUser.name,
+                    lifetimeEarnings: currentScore,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                }).catch(e=>{});
+            }
         }
 
         if (!loadMore && leaderboardData.length > 0 && (now - lbLastFetchedAt < 180000)) {
@@ -1701,8 +1686,9 @@
             animateNumber('stat-earned', lifetimeEarned);
             animateNumber('lb-you-score', lifetimeEarned);
 
-            // UPDATE LEADERBOARD IN FIREBASE AUTOMATICALLY
-            if (currentUser) {
+            // UPDATE LEADERBOARD IN FIREBASE AUTOMATICALLY ONLY IF CHANGED
+            if (currentUser && lastSyncedLifetimeEarnings !== lifetimeEarned) {
+                lastSyncedLifetimeEarnings = lifetimeEarned;
                 db.ref(`publicLeaderboard/${currentUser.uid}`).update({
                     name: currentUser.name,
                     lifetimeEarnings: lifetimeEarned,
@@ -1796,7 +1782,150 @@
     }
 
     /* =========================================
-       NEW TASK RENDER (100% Matching Image)
+       DYNAMIC 4-CLICK BEHAVIORAL ENGINE
+       ========================================= */
+    function extractTimeScore(task) {
+        if (task.estTime) {
+            const timeStr = task.estTime.toLowerCase();
+
+            // 1. Check Range FIRST (e.g., "2 - 4 Min", "10 - 20 Sec")
+            let rangeMatch = timeStr.match(/(\d+)\s*-\s*(\d+)/);
+            if (rangeMatch) {
+                let avg = (parseInt(rangeMatch[1], 10) + parseInt(rangeMatch[2], 10)) / 2;
+                if (timeStr.includes("sec")) return avg / 60;
+                if (timeStr.includes("hr") || timeStr.includes("hour")) return avg * 60;
+                return avg;
+            }
+
+            // 2. Check Compound Hours + Minutes + Seconds (e.g., "1 Hour 30 Min")
+            let totalMin = 0;
+            let found = false;
+
+            let hrMatch = timeStr.match(/(\d+)\s*(hr|hour)/);
+            if (hrMatch) { totalMin += parseInt(hrMatch[1], 10) * 60; found = true; }
+            
+            let minMatch = timeStr.match(/(\d+)\s*min/);
+            if (minMatch) { totalMin += parseInt(minMatch[1], 10); found = true; }
+            
+            let secMatch = timeStr.match(/(\d+)\s*sec/);
+            if (secMatch) { totalMin += parseInt(secMatch[1], 10) / 60; found = true; }
+            
+            if (found) return totalMin;
+
+            const match = timeStr.match(/(\d+)/g);
+            if (match && match.length > 0) {
+                let sum = 0;
+                match.forEach(m => sum += Number(m));
+                return sum / match.length;
+            }
+        }
+        return task.stages ? task.stages.length * 2 : 5;
+    }
+
+    function calculateMedians(tasks) {
+        if(tasks.length === 0) return { medianTime: 0, medianPayout: 0 };
+        const times = tasks.map(extractTimeScore).sort((a,b)=>a-b);
+        const payouts = tasks.map(getTotalPossibleCoins).sort((a,b)=>a-b);
+        const half = Math.floor(tasks.length / 2);
+        const medianTime = times.length % 2 !== 0 ? times[half] : (times[half - 1] + times[half]) / 2.0;
+        const medianPayout = payouts.length % 2 !== 0 ? payouts[half] : (payouts[half - 1] + payouts[half]) / 2.0;
+        return { medianTime, medianPayout };
+    }
+
+    function recordTaskClick(task) {
+        if (!currentUser) return;
+        const key = `earnpro_click_history_${currentUser.uid}`;
+        let history = [];
+        try { history = JSON.parse(localStorage.getItem(key)) || []; } catch(e){}
+        history.push({
+            taskId: task.id,
+            category: task.category,
+            payout: getTotalPossibleCoins(task),
+            timeScore: extractTimeScore(task),
+            timestamp: Date.now()
+        });
+        if (history.length > 4) { history = history.slice(history.length - 4); }
+        localStorage.setItem(key, JSON.stringify(history));
+    }
+
+    function getRecommendedTasks() {
+        if (!currentUser) return [];
+        const key = `earnpro_click_history_${currentUser.uid}`;
+        let history = [];
+        try { history = JSON.parse(localStorage.getItem(key)) || []; } catch(e){}
+        if (history.length < 4) return [];
+
+        const { medianTime, medianPayout } = calculateMedians(allAvailableTasks);
+
+        let catCounts = {};
+        let lowTimeCount = 0, highPayoutCount = 0;
+
+        history.forEach(h => {
+            catCounts[h.category] = (catCounts[h.category] || 0) + 1;
+            if (h.timeScore <= medianTime) lowTimeCount++;
+            if (h.payout >= medianPayout) highPayoutCount++;
+        });
+
+        let domCat = null;
+        for (let cat in catCounts) {
+            if (catCounts[cat] >= 3) domCat = cat;
+        }
+
+        let eligibleTasks = allAvailableTasks.filter(t => !userTasksStatus[t.id] || !userTasksStatus[t.id].status);
+        if (eligibleTasks.length === 0) return []; 
+
+        let recommended = [];
+
+        if (domCat && lowTimeCount >= 3 && highPayoutCount < 3) {
+            // Priority 1 - User C (Category-Specific Fast Tasks)
+            let catTasks = eligibleTasks.filter(t => t.category === domCat);
+            recommended = catTasks.sort((a,b) => extractTimeScore(a) - extractTimeScore(b)).slice(0, 2);
+        } else if (domCat && highPayoutCount >= 3) {
+            // Priority 2 - User D2 (Category-Specific High Payout)
+            let catTasks = eligibleTasks.filter(t => t.category === domCat);
+            recommended = catTasks.sort((a,b) => getTotalPossibleCoins(b) - getTotalPossibleCoins(a)).slice(0, 2);
+        } else if (domCat) {
+            // Priority 3 - User A (Category Enthusiast)
+            let catTasks = eligibleTasks.filter(t => t.category === domCat);
+            recommended = catTasks
+                .filter(t => extractTimeScore(t) <= medianTime && getTotalPossibleCoins(t) <= medianPayout)
+                .sort((a,b) => extractTimeScore(a) - extractTimeScore(b));
+            if (recommended.length < 2) {
+                recommended = catTasks.sort((a,b) => extractTimeScore(a) - extractTimeScore(b));
+            }
+            recommended = recommended.slice(0, 2);
+        } else if (!domCat && highPayoutCount >= 3 && lowTimeCount < 3) {
+            // Priority 4 - User D1 (Global High Payout - Time agnostic)
+            recommended = eligibleTasks.sort((a,b) => getTotalPossibleCoins(b) - getTotalPossibleCoins(a)).slice(0, 2);
+        } else {
+            // Priority 5 - User B (Smart Value / ROI Hunter - High Payout + Low Time)
+            let sortedByPayout = [...eligibleTasks].sort((a,b) => getTotalPossibleCoins(b) - getTotalPossibleCoins(a));
+            if (sortedByPayout.length > 1) sortedByPayout.shift(); 
+            recommended = sortedByPayout.sort((a,b) => {
+                const effA = getTotalPossibleCoins(a) / (extractTimeScore(a) || 0.1);
+                const effB = getTotalPossibleCoins(b) / (extractTimeScore(b) || 0.1);
+                return effB - effA;
+            }).slice(0, 1);
+        }
+        return recommended.map(t => t.id);
+    }
+
+    function getBonusStatus() {
+        if (!currentUser) return { canGetBonus: false, bonusJoinedCount: 0 };
+        let bonusJoinedCount = 0;
+        const now = Date.now();
+        const ONE_DAY = 24 * 3600 * 1000;
+        for (let taskId in userTasksStatus) {
+            const ut = userTasksStatus[taskId];
+            if (ut.bonusApplied === true && ut.joinTimestamp && (now - ut.joinTimestamp) < ONE_DAY) {
+                bonusJoinedCount++;
+            }
+        }
+        return { canGetBonus: bonusJoinedCount < 2, bonusJoinedCount: bonusJoinedCount };
+    }
+
+    /* =========================================
+       NEW TASK RENDER (100% Matching Image + Bonus + ₹ UI)
        ========================================= */
     function renderTasks() {
         const container = document.getElementById('main-tasks');
@@ -1807,15 +1936,33 @@
             return; 
         }
 
-        const paginatedTasks = filtered.slice(0, visibleTasksLimit);
+        const { canGetBonus } = getBonusStatus();
+        const recommendedIds = getRecommendedTasks();
+
+        let sortedTasks = [...filtered];
+        sortedTasks.sort((a, b) => {
+            const isARec = recommendedIds.includes(a.id) ? 1 : 0;
+            const isBRec = recommendedIds.includes(b.id) ? 1 : 0;
+            return isBRec - isARec;
+        });
+
+        const paginatedTasks = sortedTasks.slice(0, visibleTasksLimit);
         let html = '';
 
         paginatedTasks.forEach((task, idx) => {
-            const totalCoins = getTotalPossibleCoins(task);
+            const userTask = userTasksStatus[task.id];
+            const isJoined = !!(userTask && userTask.status);
+            const isLockedBonus = isJoined && userTask.bonusApplied === true;
+            const isDynamicBonus = !isJoined && recommendedIds.includes(task.id) && canGetBonus;
+            const hasBonus = isLockedBonus || isDynamicBonus;
+
+            const multiplier = hasBonus ? 1.2 : 1;
+            const totalCoins = Math.round(getTotalPossibleCoins(task) * multiplier);
+
             const staggerDelay = Math.min(idx % TASKS_PAGE_SIZE, 6) * 55;
-            
-            // Clean estimated time fallback
             const timeText = task.estTime ? escapeHTML(task.estTime) : '2 - 3 Min';
+
+            const bonusBadgeHtml = hasBonus ? `<div style="position:absolute; top:-12px; right: -5px; background: linear-gradient(90deg, #EF4444, #B91C1C); color:white; font-size:10px; padding:2px 8px; border-radius:100px; box-shadow:0 4px 10px rgba(220,38,38,0.3); z-index:10; white-space:nowrap; border: 1.5px solid #FEF2F2;"><i class="fa-solid fa-fire" style="color: #FFFFFF; margin-right: 4px;"></i>20% BONUS</div>` : '';
 
             html += `
                 <div class="new-task-card smooth-item" style="animation-delay: ${staggerDelay}ms;" onclick="openTask('${escapeHTML(task.id)}')">
@@ -1833,13 +1980,13 @@
                         
                         <!-- Reward Glassy Box -->
                         <div class="ntc-reward-box">
+                            ${bonusBadgeHtml}
                             <div class="ntc-reward-pill">Earn Upto</div>
                             <div class="ntc-reward-amt">
-                                ${totalCoins.toLocaleString()}
+                                <i class="fa-solid fa-indian-rupee-sign" style="font-size:18px; margin-right:4px;"></i>${totalCoins.toLocaleString()}
                             </div>
                             <div class="ntc-floating-coin">
-                                <!-- using icon as placeholder until PNG is added -->
-                                <i class="fa-solid fa-coins"></i>
+                                <i class="fa-solid fa-indian-rupee-sign"></i>
                             </div>
                         </div>
                     </div>
@@ -1929,9 +2076,11 @@
        TASK DETAIL & JOIN SYSTEM 
        ========================================= */
     function openTask(id) {
-        if (!currentUser) return; // Prevent glitches if not logged in
+        if (!currentUser) return; 
         currentTaskOpen = allAvailableTasks.find(t => t.id === id);
         if(!currentTaskOpen) return;
+
+        recordTaskClick(currentTaskOpen);
         
         showScreen('task-detail-screen');
         renderTaskDetailSkeletons();
@@ -1943,6 +2092,14 @@
         if(!task) return;
         
         const userTask = userTasksStatus[task.id];
+        const isJoined = !!(userTask && userTask.status);
+
+        const { canGetBonus } = getBonusStatus();
+        const recommendedIds = getRecommendedTasks();
+        const isLockedBonus = isJoined && userTask.bonusApplied === true;
+        const isDynamicBonus = !isJoined && recommendedIds.includes(task.id) && canGetBonus;
+        const hasBonus = isLockedBonus || isDynamicBonus;
+        const multiplier = hasBonus ? 1.2 : 1;
         
         const detailIcon = document.getElementById('detail-icon');
         const detailWrap = document.getElementById('detail-icon-wrap');
@@ -1952,7 +2109,9 @@
 
         document.getElementById('detail-title').innerHTML = `<span class="smooth-item" style="display:inline-block;">${escapeHTML(task.title)}</span>`;
         document.getElementById('detail-cat-badge').innerText = escapeHTML(task.category || 'Offer');
-        animateNumber('detail-total-reward', getTotalPossibleCoins(task));
+        
+        document.getElementById('dynamic-bonus-banner').style.display = hasBonus ? 'flex' : 'none';
+        animateNumber('detail-total-reward', Math.round(getTotalPossibleCoins(task) * multiplier));
         
         let estHtml = '';
         if (task.estTime) {
@@ -1964,7 +2123,7 @@
         const progressView = document.getElementById('task-progress-view');
 
         // Check if user has joined this task yet
-        if (!userTask || !userTask.status) {
+        if (!isJoined) {
             joinView.style.display = 'block';
             progressView.style.display = 'none';
             document.getElementById('join-name').value = currentUser.name || '';
@@ -2012,13 +2171,14 @@
 
         if(isTaskFullyComplete) {
             completeBanner.style.display = 'block';
-            bottomCta.innerHTML = `<button class="btn-royal smooth-item" onclick="showScreen('home-screen')">Explore More Tasks</button>`;
+            bottomCta.innerHTML = `<button class="btn-royal smooth-item" onclick="showScreen('home-screen'); renderTasks();">Explore More Tasks</button>`;
         }
 
         let timelineHtml = '';
         stages.forEach((stage, index) => {
             let iconBadge = '';
-            let rightLabel = `+${stage.reward} Coins`;
+            let stageCalcReward = Math.round((Number(stage.reward) || 0) * multiplier);
+            let rightLabel = `+ <i class="fa-solid fa-indian-rupee-sign"></i> ${stageCalcReward}`;
             let stageStateLabel = 'Locked';
 
             if (index < currentStageIndex || (index === 0 && (stageStatus === 'completed' || stageStatus === 'approved') && stages.length===1) || (isTaskFullyComplete && index <= currentStageIndex)) {
@@ -2049,7 +2209,7 @@
                         <div class="st-title">Stage ${index + 1} &bull; ${stageStateLabel}</div>
                         <div class="st-sub">${escapeHTML(stage.desc || stage.title)}</div>
                     </div>
-                    <div class="stage-right-coins">${escapeHTML(rightLabel)}</div>
+                    <div class="stage-right-coins">${rightLabel}</div>
                 </div>
             `;
         });
@@ -2064,6 +2224,11 @@
         if(!mobile || mobile.length !== 10 || isNaN(mobile)) return showAlert('Required', 'Valid 10-digit mobile required.', 'error');
 
         setBtnLoading('join-task-btn', true, 'Joining Task...', 'Register & Start Task');
+        
+        const { canGetBonus } = getBonusStatus();
+        const recommendedIds = getRecommendedTasks();
+        const isDynamicBonus = recommendedIds.includes(currentTaskOpen.id) && canGetBonus;
+
         const taskData = {
             status: 'joined',
             stageStatus: 'joined',
@@ -2072,6 +2237,12 @@
             joinMobile: mobile,
             timestamp: firebase.database.ServerValue.TIMESTAMP
         };
+
+        if (isDynamicBonus) {
+            taskData.bonusApplied = true;
+            taskData.bonusPercent = 20;
+            taskData.joinTimestamp = Date.now();
+        }
 
         db.ref(`users/${currentUser.uid}/tasks/${currentTaskOpen.id}`).set(taskData).then(() => {
             setBtnLoading('join-task-btn', false, '', 'Register & Start Task');
@@ -2082,8 +2253,56 @@
     }
 
     /* =========================================
-       TASK REDIRECT SYSTEM WITH FAILURE HANDLING
+       TASK REDIRECT SYSTEM WITH FAILURE HANDLING & VERIFICATION
        ========================================= */
+    function openTaskExternalOrPlayStore(rawUrl) {
+        if (!rawUrl || rawUrl === '#' || rawUrl === 'undefined') return true;
+        const url = String(rawUrl).trim();
+        const isAndroid = /Android/i.test(navigator.userAgent);
+
+        try {
+            // Case 1: Direct Google Play Store URL -> Force native Play Store App while keeping all query/referrer params
+            if (isAndroid && (url.includes('play.google.com/store/apps/details') || url.startsWith('market://'))) {
+                let queryPart = '';
+                if (url.includes('?')) {
+                    queryPart = url.substring(url.indexOf('?') + 1);
+                }
+                const intentPlayUrl = `intent://details?${queryPart}#Intent;scheme=market;package=com.android.vending;S.browser_fallback_url=${encodeURIComponent(url)};end`;
+                window.location.href = intentPlayUrl;
+                return true;
+            }
+
+            // Case 2: Third-Party Affiliate / Tracking Link on Android -> Open via External Chrome/System Intent so its redirect lands directly in Play Store App
+            if (isAndroid && /^https?:\/\//i.test(url)) {
+                const win = window.open(url, '_blank', 'noopener,noreferrer');
+                if (!win || win.closed || typeof win.closed === 'undefined') {
+                    const scheme = url.startsWith('https://') ? 'https' : 'http';
+                    const cleanPath = url.replace(/^https?:\/\//i, '');
+                    const externalIntentUrl = `intent://${cleanPath}#Intent;scheme=${scheme};action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(url)};end`;
+                    window.location.href = externalIntentUrl;
+                }
+                return true;
+            }
+
+            // Case 3: Desktop / iOS / Standard Browser Fallback
+            const a = document.createElement('a');
+            a.href = url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            return true;
+        } catch (err) {
+            try {
+                window.location.href = url;
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+    }
+
     function startTaskStage(taskId, stageIndex, linkUrl) {
         const loader = document.getElementById('task-redirect-loader');
         if(loader.style.display === 'flex') return;
@@ -2095,30 +2314,27 @@
         const retryBtn = document.getElementById('redirect-retry-btn');
         const cancelBtn = document.getElementById('redirect-cancel-btn');
 
-        // NEW LOADER TEXT
         loader.style.display = 'flex';
         spinner.style.display = 'block';
         retryBtn.style.display = 'none';
         cancelBtn.style.display = 'none';
         text.innerHTML = 'Redirecting to Task...<br><span style="font-size:13px; font-weight:500; margin-top:8px; display:block; opacity:0.9;">Please wait while we verify and redirect you.</span>';
 
-        let popupWindow = null;
         let navFailed = false;
-
         if (linkUrl && linkUrl !== '#' && linkUrl !== 'undefined') {
-            try {
-                popupWindow = window.open(linkUrl, '_blank');
-                if (!popupWindow || popupWindow.closed || typeof popupWindow.closed === 'undefined') {
-                    navFailed = true;
-                }
-            } catch (e) {
-                navFailed = true;
-            }
+            const opened = openTaskExternalOrPlayStore(linkUrl);
+            if (!opened) navFailed = true;
         }
 
         const task = allAvailableTasks.find(t => t.id === taskId);
         const stage = task.stages ? task.stages[stageIndex] : null;
-        const reward = stage ? stage.reward : task.reward;
+        const baseReward = Number(stage ? stage.reward : task.reward);
+
+        const userTask = userTasksStatus[taskId];
+        const { bonusJoinedCount } = getBonusStatus();
+        
+        const isBonusVerified = userTask && userTask.bonusApplied === true && userTask.bonusPercent === 20 && bonusJoinedCount <= 2;
+        const expectedReward = isBonusVerified ? Math.round(baseReward * 1.20) : baseReward;
 
         const newReqRef = db.ref('pendingRequests').push();
         const requestData = { 
@@ -2128,7 +2344,10 @@
             taskId: taskId, 
             taskName: task.title, 
             stageIndex: stageIndex, 
-            expectedReward: reward, 
+            expectedReward: expectedReward, 
+            baseReward: baseReward,
+            bonusPercent: isBonusVerified ? 20 : 0,
+            isBonusVerified: isBonusVerified,
             timestamp: firebase.database.ServerValue.TIMESTAMP, 
             status: 'pending' 
         };
@@ -2148,7 +2367,7 @@
                 setTimeout(() => {
                     closeRedirectLoader();
                     showAlert('Submitted', 'Stage submission sent for verification.', 'success');
-                }, 1000); // 1 sec delay to show the nice text
+                }, 1000);
             }
         }).catch(err => {
             showRedirectError();
