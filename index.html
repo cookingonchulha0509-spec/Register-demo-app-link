@@ -1065,7 +1065,50 @@
     </div>
 
 </div>
+<div id="app-version"
+style="position:fixed;bottom:8px;right:12px;
+font-size:11px;color:#888;z-index:9999">
+Checking version...
+</div>
 
+<script>
+(async function () {
+  let version = "Not detected";
+
+  try {
+    // Possible native AppCreator24 interfaces
+    const bridges = [
+      window.AppCreator24,
+      window.Android,
+      window.AndroidBridge,
+      window.AppInterface
+    ];
+
+    for (const bridge of bridges) {
+      if (!bridge) continue;
+
+      if (typeof bridge.getVersionName === "function") {
+        version = bridge.getVersionName();
+        break;
+      }
+    }
+
+    // Save locally on this device only
+    if (version !== "Not detected") {
+      localStorage.setItem("installed_apk_version", version);
+    } else {
+      version = localStorage.getItem("installed_apk_version") || version;
+    }
+
+    document.getElementById("app-version").textContent =
+      "App Version: " + version;
+
+  } catch (error) {
+    document.getElementById("app-version").textContent =
+      "App Version: Not detected";
+  }
+})();
+</script>
 <script>
     /* =========================================
        FIREBASE CONFIGURATION
